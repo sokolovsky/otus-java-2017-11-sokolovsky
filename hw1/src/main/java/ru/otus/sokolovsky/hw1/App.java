@@ -22,6 +22,8 @@ public class App {
     static public void main(String[] args) {
         DefaultParser parser = new DefaultParser();
         CommandLine cli;
+        // Test instance of SecondClass
+        new SecondClass();
         try {
             cli = parser.parse(createOptions(), args);
         } catch (ParseException e) {
