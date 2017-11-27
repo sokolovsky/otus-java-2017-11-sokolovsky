@@ -12,10 +12,16 @@ public class App {
 
         MemoryStand stand = new MemoryStand(memoryVolumeChecker, measurer);
 
-        stand.useCase(new SingleObjectCreation());
-        stand.useCase(new EmptyStringCreation());
         stand.useCase(new ArrayOfIntegerCreation());
         stand.useCase(new ArrayOfEmptyStringsCreation());
         stand.useCase(new ArrayOfEmptyStringsUseSugarCreation());
+        stand.useCase(new ArrayOfLongItems());
+        stand.useCase(new ArrayOfIntItems());
+        stand.useCase(new ArrayOfCharsUnderString());
+        stand.useCase(new ArrayOfCustomClassObjectsWithoutFields());
+        stand.useCase(new ArrayOfCustomClassObjectsWithPrimitiveFields());
+        stand.useCase(new ArrayOfCustomClassObjectsWithPrimitiveReferences());
+        stand.useCase(new SingleObjectCreation());
+        stand.useCase(new EmptyStringCreation());
     }
 }
