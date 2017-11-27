@@ -12,6 +12,6 @@ public class SingleObjectCreation implements MeasureCase {
 
     @Override
     public String description() {
-        return "Single object creation";
+        return "Single object creation. As we can see it's not true, because unit of measure too small.";
     }
 }
