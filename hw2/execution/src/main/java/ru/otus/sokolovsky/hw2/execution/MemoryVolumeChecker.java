@@ -1,12 +1,12 @@
 package ru.otus.sokolovsky.hw2.execution;
 
-public class MemoryChecker {
+public class MemoryVolumeChecker {
 
     private Runtime runtime;
     private boolean running = false;
     private long initFilled;
 
-    MemoryChecker(Runtime runtime) {
+    MemoryVolumeChecker(Runtime runtime) {
         this.runtime = runtime;
     }
 
