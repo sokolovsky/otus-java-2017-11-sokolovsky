@@ -23,5 +23,6 @@ public class App {
         stand.useCase(new ArrayOfCustomClassObjectsWithPrimitiveReferences());
         stand.useCase(new SingleObjectCreation());
         stand.useCase(new EmptyStringCreation());
+        stand.useCase(new ArrayOfEmptyIntegerArrays());
     }
 }
