@@ -9,7 +9,10 @@
 **/log/
 **/target/
 
-#Gradle
+# Gradle
 **/build/
 **/gradle/
 **/.gradle/
+
+# JAR Files 
+*.jar
