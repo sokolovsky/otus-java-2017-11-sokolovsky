@@ -21,7 +21,7 @@ public class MemoryStand {
         aCase.createData();
         long usageBytesCount = volumeChecker.takeMeasure();
 
-        long recordSize = (long) Math.ceil((double) usageBytesCount / aCase.count());
+        long recordSize = (long) Math.rint((double) usageBytesCount / aCase.count());
         reportCaseMeasure(aCase, usageBytesCount, recordSize, objectSize);
     }
 
