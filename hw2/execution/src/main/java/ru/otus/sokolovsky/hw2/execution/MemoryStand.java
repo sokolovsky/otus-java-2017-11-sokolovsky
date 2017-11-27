@@ -27,7 +27,7 @@ public class MemoryStand {
 
     private void reportCaseMeasure(MeasureCase aCase, long dataUsage, long recordSize, long objectSize) {
         System.out.format(
-                "\nMeasure case #%d\n%s\nObject size without dependencies: %d\nMemory growth: %d (%d per one)\n",
+                "\nMeasure case #%d\n%s\nObject size without dependencies: %d kb\nMemory growth: %d kb (%d kb/one)\n",
                 counter,
                 aCase.description(),
                 objectSize,
