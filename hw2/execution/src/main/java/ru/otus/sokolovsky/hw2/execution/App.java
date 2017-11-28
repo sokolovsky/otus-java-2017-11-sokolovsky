@@ -18,7 +18,6 @@ public class App {
 
         MemoryStand stand = new MemoryStand(memoryVolumeChecker, measurer);
 
-
         testMeasureGrowth(stand, new ObjectDataGenerator(new Object()));
 
         testMeasureGrowth(stand, new ObjectDataGenerator(new EmptyString()));
@@ -32,7 +31,6 @@ public class App {
         testMeasureGrowth(stand, new ArrayOfIntItems());
         testMeasureGrowth(stand, new ArrayOfLongItems());
         testMeasureGrowth(stand, new ArrayOfEmptyIntegerArrays());
-
 
     }
 

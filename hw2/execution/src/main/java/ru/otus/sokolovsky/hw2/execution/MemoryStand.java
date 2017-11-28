@@ -14,18 +14,18 @@ public class MemoryStand {
 
     public void useMeasureCase(DataGenerator dataGenerator) {
         counter++;
-        long objectSize = instrumentationMeasurer.getMemorySize(dataGenerator);
         volumeChecker.initMeasure();
         dataGenerator.createData();
         long usageBytesCount = volumeChecker.takeMeasure();
+        long generatorSize = instrumentationMeasurer.deepMemorySize(dataGenerator);
 
         long recordSize = (long) Math.rint((double) usageBytesCount / dataGenerator.count());
-        reportCaseMeasure(dataGenerator, usageBytesCount, recordSize, objectSize);
+        reportCaseMeasure(dataGenerator, usageBytesCount, recordSize, generatorSize);
     }
 
     private void reportCaseMeasure(DataGenerator aCase, long dataUsage, long recordSize, long objectSize) {
         System.out.format(
-                "\nMeasure case #%d\n%s\nGenerator size without dependencies: %d bytes\nMemory growth: %d bytes (%d bytes/one)\n",
+                "\nMeasure case #%d\n%s\nGenerator size: %d bytes\nMemory growth: %d bytes (%d bytes/one)\n",
                 counter,
                 aCase.description(),
                 objectSize,
