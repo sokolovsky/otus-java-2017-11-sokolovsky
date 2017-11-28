@@ -1,5 +1,6 @@
 package ru.otus.sokolovsky.hw2.execution.mocks;
 
 public class ClassWithReferences {
-    private ClassWithoutFields obj;
+    private ClassWithoutFields firstReference;
+    private ClassWithoutFields secondReference;
 }
