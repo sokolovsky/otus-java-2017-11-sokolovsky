@@ -4,7 +4,7 @@
 
 Кольцевой буфер, или циклический буфер (англ. ring-buffer) — это структура данных, использующая единственный буфер фиксированного размера, как будто бы после последнего элемента сразу же снова идет первый.
 
-Реализован в виде класса `ru.otus.sokolovsky.hw3.CircularBufferQueue` реализующиего интерфейс `java.util.Queue`
+Реализован в виде класса `ru.otus.sokolovsky.hw3.CircularBufferQueue` реализующего интерфейс `java.util.Queue`
 
 Запуск работы очерерди происходит при помощи тестового класса `ru.otus.sokolovsky.hw3.CircularBufferQueueTest`
 
