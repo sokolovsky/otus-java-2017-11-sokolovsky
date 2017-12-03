@@ -157,4 +157,17 @@ public class CircularBufferQueueTest {
         assertEquals(Integer.valueOf(10), queue.poll());
         assertTrue(queue.isEmpty());
     }
+
+    @Test
+    public void overflowException() {
+        CircularBufferQueue<Integer> queue = new CircularBufferQueue<Integer>(2, true);
+        queue.add(1);
+        queue.add(2);
+
+        try {
+            queue.add(3);
+            fail("Expected overflow exception");
+        } catch (RuntimeException e) {
+        }
+    }
 }

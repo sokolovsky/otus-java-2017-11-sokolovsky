@@ -4,9 +4,15 @@ import java.util.*;
 
 public class CircularBufferQueue <E> implements Queue<E> {
     private Object[] internalArray;
+    private boolean notOverflowed = false;
 
     private int size = 0;
     private int head = 0;
+
+    public CircularBufferQueue (int volume, boolean notOverflowed) {
+        internalArray = new Object[volume];
+        this.notOverflowed = notOverflowed;
+    }
 
     public CircularBufferQueue (int volume) {
         internalArray = new Object[volume];
@@ -96,9 +102,13 @@ public class CircularBufferQueue <E> implements Queue<E> {
     }
 
     public boolean add(E e) {
-        int position = head + size;
-
         int volume = internalArray.length;
+
+        if (notOverflowed && size() + 1 > volume) {
+            throw new RuntimeException("Volume of queue was oveflowed");
+        }
+
+        int position = head + size;
 
         if (position >= volume) {
             position = position - volume;
