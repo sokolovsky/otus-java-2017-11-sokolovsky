@@ -1,5 +1,8 @@
 package ru.otus.sokolovsky.hw4;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+
 import static java.lang.management.ManagementFactory.*;
 
 /**
@@ -18,16 +21,31 @@ import static java.lang.management.ManagementFactory.*;
  Сделать выводы.
  */
 public class App {
-    public static void main(String[] args) throws InterruptedException {
-        GCRunsReporter GCReporter = new GCRunsReporter(getGarbageCollectorMXBeans());
-        GCReporter.listen(false);
+    public static void main(String[] args) {
+        System.out.println("Starting pid: " + ManagementFactory.getRuntimeMXBean().getName());
+        System.out.println("CPU cores count: " + Runtime.getRuntime().availableProcessors());
 
-        LeakedProcess leakedProcess = new LeakedProcess();
+        GCRunsMeasurer GCReporter = new GCRunsMeasurer(getGarbageCollectorMXBeans(), System.out);
+        Thread reporterThread = new Thread(GCReporter);
+        reporterThread.start();
+        long oomTotalMemory;
+
+        LeakedProcess leakedProcess = new LeakedProcess(System.out);
         try {
             leakedProcess.run();
         } catch (OutOfMemoryError e) {
-            String mem = Utils.humanReadableByteCount(Runtime.getRuntime().totalMemory());
-            System.out.printf("Memory (%s) is run out\n%s", mem, GCReporter.getReport());
+            oomTotalMemory = Runtime.getRuntime().totalMemory();
+            leakedProcess.erase();
+            String mem = Utils.humanReadableByteCount(oomTotalMemory);
+
+            RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
+            long uptimeOfSec = rb.getUptime() / 1000;
+
+            System.out.printf("\nMemory (%s) ran out, time %d sec\n", mem, uptimeOfSec);
+            GCReporter.publishCommonMeasure();
+            throw e;
+        } finally {
+            reporterThread.interrupt();
         }
     }
 }
