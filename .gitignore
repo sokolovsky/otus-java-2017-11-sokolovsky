@@ -16,3 +16,6 @@
 
 # JAR Files 
 *.jar
+
+# Log files
+*.log
