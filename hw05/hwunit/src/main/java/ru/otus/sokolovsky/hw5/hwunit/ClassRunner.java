@@ -6,6 +6,7 @@ import ru.otus.sokolovsky.hw5.hwunit.annotations.Test;
 import ru.otus.sokolovsky.hw5.hwunit.assertions.AssertionException;
 import ru.otus.sokolovsky.hw5.hwunit.utils.ReflectionHelper;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -78,51 +79,67 @@ class ClassRunner {
 
     public void run() {
         for (Method method : testMethods) {
-            Object instance = ReflectionHelper.instantiate(this.cls);
-            MethodTotal total = MethodTotal.SUCCESS;
-            String message = null;
-            try {
-                runBeforeMethods(instance);
-                try {
-                    runTestMethod(instance, method);
-                } catch (Throwable e) {
-                    Class<? extends Throwable> expected = expectedException.get(method);
-                    if (e.getClass() != expected) {
-                        throw e;
-                    }
-                }
-                runAfterMethods(instance);
-            } catch (AssertionException assertionException) {
-                total = MethodTotal.FAIL;
-                message = assertionException.getMessage();
-            } catch (RuntimeException rException) {
-                total = MethodTotal.ERROR_EXCEPTION;
-                message = rException.getMessage();
-            }
-
-            MethodResult methodResult = new MethodResult(method.getName(), total);
-            methodResult.setMassage(message);
-            this.result.add(methodResult);
+            processMethod(method);
         }
+    }
+
+    private void processMethod(Method method) {
+        Object instance = ReflectionHelper.instantiate(this.cls);
+        MethodTotal total = MethodTotal.SUCCESS;
+        String message = null;
+        try {
+            runBeforeMethods(instance);
+            try {
+                runTestMethod(instance, method);
+            } catch (Throwable e) {
+                Class<? extends Throwable> expected = expectedException.get(method);
+                if (e.getClass() != expected) {
+                    throw e;
+                }
+            }
+            runAfterMethods(instance);
+        } catch (AssertionException assertionException) {
+            total = MethodTotal.FAIL;
+            message = assertionException.getMessage();
+        } catch (Throwable thException) {
+            total = MethodTotal.ERROR_EXCEPTION;
+            message = thException.getMessage();
+        }
+
+        MethodResult methodResult = new MethodResult(method.getName(), total);
+        methodResult.setMassage(message);
+        this.result.add(methodResult);
     }
 
     public List<MethodResult> getResult() {
         return result;
     }
 
-    private void runTestMethod(Object instance, Method method) {
-        ReflectionHelper.callMethod(instance, method.getName());
+    private void runTestMethod(Object instance, Method method) throws Throwable {
+        try {
+            ReflectionHelper.callMethod(instance, method.getName());
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
     }
 
     private void runAfterMethods(Object instance) {
         for (Method method : afterMethods) {
-            ReflectionHelper.callMethod(instance, method.getName());
+            try {
+                ReflectionHelper.callMethod(instance, method.getName());
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private void runBeforeMethods(Object instance) {
         for (Method method : beforeMethods) {
-            ReflectionHelper.callMethod(instance, method.getName());
+            try {
+                ReflectionHelper.callMethod(instance, method.getName());
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
