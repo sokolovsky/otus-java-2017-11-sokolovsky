@@ -16,11 +16,13 @@ public class TestClass {
 
     @Test
     public void sumOfTwoNumbers() {
+        System.out.println("Run testing method");
         Assertion.assertEquals(5, 1 + 4);
     }
 
     @Test(expected = RuntimeException.class)
     public void customException() {
+        System.out.println("Run testing method");
         throw new RuntimeException("Exception for testing class");
     }
 
