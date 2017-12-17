@@ -5,10 +5,12 @@ public class AssertionException extends RuntimeException {
     private String message;
     private Object actual;
     private Object expected;
+    private boolean withoutExpectedValue = false;
 
     AssertionException(String message, Object actual) {
         this.message = message;
         this.actual = actual;
+        withoutExpectedValue = true;
     }
 
     AssertionException(String message, Object actual, Object expected) {
@@ -30,6 +32,9 @@ public class AssertionException extends RuntimeException {
 
     @Override
     public String getMessage() {
+        if (withoutExpectedValue) {
+            return message;
+        }
         return String.format(
                 "\n%s\nActual:%s\nExpected:%s\n",
                 message,
