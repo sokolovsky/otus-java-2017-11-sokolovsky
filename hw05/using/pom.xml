@@ -8,13 +8,45 @@
     <artifactId>using</artifactId>
     <version>1.0</version>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <commons.cli.version>1.4</commons.cli.version>
+        <project.mainClass>ru.otus.sokolovsky.hw5.using.App</project.mainClass>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>ru.otus.sokolovsky.hw5</groupId>
             <artifactId>hwunit</artifactId>
             <version>1.0.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../hwunit/target/ru.otus.sokolovsky.hw5-hwunit(1.0)-jar-with-dependencies.jar</systemPath>
+            <systemPath>${project.basedir}/../hwunit/target/hwunit-jar-with-dependencies.jar</systemPath>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>${project.name}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>${project.mainClass}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
