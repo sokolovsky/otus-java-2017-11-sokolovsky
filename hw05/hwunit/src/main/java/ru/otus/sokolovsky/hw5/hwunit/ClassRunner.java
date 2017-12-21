@@ -6,9 +6,11 @@ import ru.otus.sokolovsky.hw5.hwunit.annotations.Test;
 import ru.otus.sokolovsky.hw5.hwunit.assertions.AssertionException;
 import ru.otus.sokolovsky.hw5.hwunit.utils.ReflectionHelper;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Predicate;
 
 class ClassRunner {
     private Class<?> cls;
@@ -55,6 +57,10 @@ class ClassRunner {
         this.cls = cls;
 
         for (Method method : cls.getMethods()) {
+
+            if (hasAmbiguousDeclarations(method)) {
+                throw new RuntimeException("Methods  must have single annotation declare");
+            }
             Test testAnnotation = method.getAnnotation(Test.class);
             Before beforeAnnotation = method.getAnnotation(Before.class);
             After afterAnnotation = method.getAnnotation(After.class);
@@ -114,6 +120,22 @@ class ClassRunner {
     public List<MethodResult> getResult() {
         return result;
     }
+
+    @SuppressWarnings("unchecked")
+    private boolean hasAmbiguousDeclarations(Method method) {
+        Class<? extends Annotation>[] list = new Class[]{Test.class, Before.class, After.class};
+
+        int declarationsCount = 0;
+        for (Class<? extends Annotation> aClass : list) {
+            if (method.isAnnotationPresent(aClass)) {
+                declarationsCount++;
+
+            }
+        }
+        return declarationsCount > 1;
+    }
+
+
 
     private void runTestMethod(Object instance, Method method) throws Throwable {
         try {
