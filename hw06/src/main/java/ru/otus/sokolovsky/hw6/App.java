@@ -13,7 +13,7 @@ public class App {
 
         Terminal terminal = new Terminal(new PrintWriter(System.out), new InputStreamReader(System.in));
 
-        terminal.writeln("Terminal is starting...");
+        terminal.writeln("Terminal is switching on ...");
 
         new FrontContext(terminal).run();
     }
