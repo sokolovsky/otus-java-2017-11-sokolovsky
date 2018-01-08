@@ -7,7 +7,7 @@ public class Terminal {
 
     private final Writer out;
     private final Reader in;
-    private String prompt = "/>";
+    private String prompt = "";
 
     public Terminal(Writer out, Reader in) {
         this.out = out;
@@ -15,7 +15,11 @@ public class Terminal {
     }
 
     public String getLine() throws IOException {
-        out.write(prompt);
+        return getLine(prompt);
+    }
+
+    public String getLine(String prompt) throws IOException {
+        out.write(prompt + " /> ");
         out.flush();
         return readLine();
     }
