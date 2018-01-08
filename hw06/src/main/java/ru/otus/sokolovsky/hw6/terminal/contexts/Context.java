@@ -12,9 +12,11 @@ abstract class Context {
     private Terminal terminal;
     private List<CommandParser> parsers = new LinkedList<>();
 
-    Context(Terminal terminal) throws Exception {
+    public Context(Terminal terminal) throws Exception {
         this.terminal = terminal;
+    }
 
+    private void initActionParsers() throws Exception {
         LinkedList<Action> actionsList = new LinkedList<>(Arrays.asList(actions()));
         actionsList.add(new QuitAction());
         actionsList.add(new HelpAction(actionsList));
@@ -30,6 +32,8 @@ abstract class Context {
     }
 
     public void run() throws Exception {
+        initActionParsers();
+
         Action action = null;
         while (action == null || action.getClass() != QuitAction.class) {
             terminal().setPrompt(prompt());

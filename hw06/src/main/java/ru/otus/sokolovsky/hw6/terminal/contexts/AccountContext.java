@@ -2,8 +2,7 @@ package ru.otus.sokolovsky.hw6.terminal.contexts;
 
 import ru.otus.sokolovsky.hw6.accounting.Account;
 import ru.otus.sokolovsky.hw6.terminal.Terminal;
-import ru.otus.sokolovsky.hw6.terminal.actions.Action;
-import ru.otus.sokolovsky.hw6.terminal.actions.GetAccountBalance;
+import ru.otus.sokolovsky.hw6.terminal.actions.*;
 
 public class AccountContext extends Context {
     private Account account;
@@ -15,13 +14,16 @@ public class AccountContext extends Context {
 
     @Override
     protected String prompt() {
-        return String.format("Session %s account /> ", account.getNumber());
+        return String.format("Session of account `%s`", account.getNumber());
     }
 
     @Override
     protected Action[] actions() {
         return new Action[] {
-            new GetAccountBalance(account)
+            new GetAccountBalance(account),
+            new PutMoneyIntoAccount(account),
+            new GettingMoneyFromAccount(account),
+            new GetAccountHistory(account)
         };
     }
 }
