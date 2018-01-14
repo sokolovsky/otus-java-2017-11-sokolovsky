@@ -1,23 +1,45 @@
 package ru.otus.sokolovsky.hw7.atm;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class Machine {
-    private static Machine ourInstance = new Machine();
-    private List<String> history = new LinkedList<>();
-    private Map<Note, Integer> cells = new TreeMap<>((n1, n2) -> (n1.getAmount() - n2.getAmount()) * -1);
+    private List<String> history;
+    private SortedMap<Note, Integer> cells;
 
     private int amount = 0;
 
-    public static Machine getInstance() {
-        return ourInstance;
+    public Machine(State state) {
+        setState(state);
     }
 
-    private Machine() {
+    public Machine() {
+        reset();
     }
 
-    public synchronized void putMoney(Note note, int noteCount) {
+    public Machine setState(State state) {
+        Objects.requireNonNull(state);
+        reset();
+        for (Map.Entry<Note, Integer> entry : state.getCells().entrySet()) {
+            putMoney(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    public State createState() {
+        State state = new State();
+        state.setCells(Collections.unmodifiableMap(cells));
+        return state;
+    }
+
+    private void reset() {
+        cells = new TreeMap<>((n1, n2) -> (n1.getAmount() - n2.getAmount()) * -1);
+        history = new LinkedList<>();
+        amount = 0;
+    }
+
+    public void putMoney(Note note, int noteCount) {
         putInCell(note, noteCount);
         amount += noteCount * note.getAmount();
         writeToHistory("putting", noteCount);
@@ -53,11 +75,11 @@ public class Machine {
         return res;
     }
 
-    public synchronized boolean canGetSum(int sum) {
+    public boolean canGetSum(int sum) {
         return prepareNotesSet(sum, new HashMap<>());
     }
 
-    public synchronized Map<Note, Integer> getMoney(int amount) throws Exception {
+    public Map<Note, Integer> getMoney(int amount) throws Exception {
         if (this.amount < amount) {
             throw new Exception("Not enough money in ATM");
         }
@@ -110,5 +132,17 @@ public class Machine {
                 .filter((Note n) -> cells.get(n) > 0)
                 .min(Comparator.comparingInt(Note::getAmount))
                 .orElse(null);
-    };
+    }
+
+    public class State implements Serializable {
+        private Map<Note, Integer> cells;
+
+        void setCells(Map<Note, Integer> cells) {
+            this.cells = cells;
+        }
+
+        Map<Note, Integer> getCells() {
+            return cells;
+        }
+    }
 }
