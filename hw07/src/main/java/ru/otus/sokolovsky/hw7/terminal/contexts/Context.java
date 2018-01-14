@@ -1,10 +1,10 @@
 package ru.otus.sokolovsky.hw7.terminal.contexts;
 
+import ru.otus.sokolovsky.hw7.terminal.actions.ActionDefinitionException;
 import ru.otus.sokolovsky.hw7.terminal.Terminal;
 import ru.otus.sokolovsky.hw7.terminal.actions.*;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,7 +45,7 @@ abstract class Context {
             for (CommandParser parser : parsers) {
                 if (parser.match(line)) {
                     action = parser.parse(line);
-                    action.run(terminal());
+                    action.execute(terminal());
                     break;
                 }
             }
