@@ -13,7 +13,7 @@ public class HelpAction implements Action {
     }
 
     @Override
-    public void run(Terminal terminal) {
+    public void execute(Terminal terminal) {
         terminal.writeln("Available commands:");
         for (Action action : actions) {
             writeString(terminal, action);

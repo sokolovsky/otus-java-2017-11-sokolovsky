@@ -4,7 +4,7 @@ import ru.otus.sokolovsky.hw7.terminal.Terminal;
 
 public class QuitAction implements Action {
     @Override
-    public void run(Terminal terminal) {
+    public void execute(Terminal terminal) {
         terminal.writeln("Quit");
     }
 

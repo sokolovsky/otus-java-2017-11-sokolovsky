@@ -12,7 +12,7 @@ public class GetAccountBalance implements Action {
     }
 
     @Override
-    public void run(Terminal terminal) {
+    public void execute(Terminal terminal) {
         terminal.writeln(String.format("Balance of account is - %d", account.getBalance()));
     }
 

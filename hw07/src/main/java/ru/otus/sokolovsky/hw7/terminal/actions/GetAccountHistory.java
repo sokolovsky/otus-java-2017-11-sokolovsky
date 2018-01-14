@@ -12,7 +12,7 @@ public class GetAccountHistory implements Action {
     }
 
     @Override
-    public void run(Terminal terminal) {
+    public void execute(Terminal terminal) {
         for (String record : account.history()) {
             terminal.writeln(String.format("Balance of account is - %d", account.getBalance()));
         }

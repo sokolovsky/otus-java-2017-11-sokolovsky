@@ -7,10 +7,16 @@ import ru.otus.sokolovsky.hw7.terminal.Terminal;
 import java.util.Map;
 
 public class AdminInfoAction implements Action {
+
+    private Machine machine;
+
+    public AdminInfoAction(Machine machine) {
+        this.machine = machine;
+    }
+
     @Override
-    public void run(Terminal terminal) {
+    public void execute(Terminal terminal) {
         terminal.writeln("ATM Info");
-        Machine machine = Machine.getInstance();
         terminal.writeln(String.format("Amount: %d", machine.getAmount()));
         Map<Note, Integer> cells = machine.getCellsInfo();
         if (cells.size() == 0) {

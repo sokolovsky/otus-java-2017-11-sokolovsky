@@ -1,14 +1,23 @@
 package ru.otus.sokolovsky.hw7.terminal.actions;
 
+import ru.otus.sokolovsky.hw7.atm.Machine;
 import ru.otus.sokolovsky.hw7.terminal.Terminal;
 import ru.otus.sokolovsky.hw7.terminal.contexts.AdminContext;
 
-public class SwitchToAdminContext implements Action {
+public class AdminSupplyMachine implements Action {
+
+    private Machine machine;
+    private int number;
+
+    public AdminSupplyMachine(Machine machine, int number) {
+        this.machine = machine;
+        this.number = number;
+    }
 
     @Override
-    public void run(Terminal terminal) {
+    public void execute(Terminal terminal) {
         try {
-            AdminContext context = new AdminContext(terminal);
+            AdminContext context = new AdminContext(terminal, machine, number);
             context.run();
         } catch (Exception e) {
             e.printStackTrace();

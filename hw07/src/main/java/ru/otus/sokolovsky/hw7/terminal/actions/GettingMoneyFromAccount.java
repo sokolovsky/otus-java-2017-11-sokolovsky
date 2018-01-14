@@ -12,41 +12,17 @@ import java.util.Map;
 public class GettingMoneyFromAccount implements Action {
 
     private Account account;
+    private Machine machine;
 
-    public GettingMoneyFromAccount(Account account) {
+    public GettingMoneyFromAccount(Account account, Machine machine) {
         this.account = account;
+        this.machine = machine;
     }
 
     @Override
-    public void run(Terminal terminal) {
-        terminal.writeln("Getting money");
-        int sum = 0;
-        do {
-            try {
-                Note minNote = Machine.getInstance().getMinNote();
-                if (minNote == null) {
-                    terminal.writeln("There are no money in ATM");
-                    return;
-                }
-                String line = terminal.getLine(String.format("Type sum of money, min sum is `%,d`", minNote.getAmount()));
-                sum = Integer.parseInt(line);
-            } catch (NumberFormatException e) {
-                continue;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
-            if (account.getBalance() < sum) {
-                terminal.writeln("Amount sum your account is not enough, try to type another one");
-                sum = 0;
-                continue;
-            }
-            if (!Machine.getInstance().canGetSum(sum)) {
-                terminal.writeln(String.format("It is impossible to get sum `%,d`, try to type another one", sum));
-                sum = 0;
-            }
-        } while (sum == 0);
-
+    public void execute(Terminal terminal) {
+        terminal.writeln("Getting account money");
+        int sum = handleUserSum(terminal);
         try {
             account.withdraw(sum);
         } catch (WrongOperationException e) {
@@ -56,7 +32,7 @@ public class GettingMoneyFromAccount implements Action {
 
         Map<Note, Integer> money;
         try {
-            money = Machine.getInstance().getMoney(sum);
+            money = machine.getMoney(sum);
         } catch (Exception e) {
             e.printStackTrace();
             return;
@@ -76,5 +52,35 @@ public class GettingMoneyFromAccount implements Action {
     @Override
     public String formula() {
         return "get";
+    }
+
+    private int handleUserSum(Terminal terminal) {
+        int sum = 0;
+        do {
+            try {
+                Note minNote = machine.getMinNote();
+                if (minNote == null) {
+                    terminal.writeln("There are no money in ATM");
+                    return 0;
+                }
+                String line = terminal.getLine(String.format("Type sum of money, min sum is `%,d`", minNote.getAmount()));
+                sum = Integer.parseInt(line);
+            } catch (NumberFormatException e) {
+                continue;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return 0;
+            }
+            if (account.getBalance() < sum) {
+                terminal.writeln("Amount sum yours account is not enough, try to type another one");
+                sum = 0;
+                continue;
+            }
+            if (!machine.canGetSum(sum)) {
+                terminal.writeln(String.format("It is impossible to get sum `%,d`, try to type another one", sum));
+                sum = 0;
+            }
+        } while (sum == 0);
+        return sum;
     }
 }

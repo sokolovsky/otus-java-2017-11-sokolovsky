@@ -6,9 +6,16 @@ import ru.otus.sokolovsky.hw7.terminal.Terminal;
 import java.util.List;
 
 public class AdminHistoryAction implements Action {
+
+    private Machine machine;
+
+    public AdminHistoryAction(Machine machine) {
+        this.machine = machine;
+    }
+
     @Override
-    public void run(Terminal terminal) {
-        List<String> history = Machine.getInstance().history();
+    public void execute(Terminal terminal) {
+        List<String> history = machine.history();
         if (history.size() == 0) {
             terminal.writeln("There is no history yet");
         }

@@ -12,6 +12,7 @@ import java.util.Map;
 public class PutMoneyIntoAccount implements Action {
 
     private Account account;
+    private Machine machine;
     private static Map<Integer, Note> notesChoice;
 
     static {
@@ -22,12 +23,23 @@ public class PutMoneyIntoAccount implements Action {
         }
     }
 
-    public PutMoneyIntoAccount(Account account) {
+    public PutMoneyIntoAccount(Account account, Machine machine) {
         this.account = account;
+        this.machine = machine;
     }
 
     @Override
-    public void run(Terminal terminal) {
+    public String help() {
+        return "Puts money into account";
+    }
+
+    @Override
+    public String formula() {
+        return "put";
+    }
+
+    @Override
+    public void execute(Terminal terminal) {
         terminal.writeln("Putting money");
         int credit = 0;
         while (true) {
@@ -39,43 +51,18 @@ public class PutMoneyIntoAccount implements Action {
             }
             terminal.writeln("Type `q` for exit");
 
-            int numberOfNote;
-            Note note;
+            NoteBatch noteBatch = null;
             try {
-                String line = terminal.getLine("enter the number").trim();
-                if (line.equals("q")) {
-                    break;
-                }
-                numberOfNote = Integer.parseInt(line);
-                note = notesChoice.get(numberOfNote);
-                if (note == null) {
-                    terminal.writeln("Wrong note number");
-                    continue;
-                }
-            } catch (NumberFormatException e) {
-                terminal.writeln("Wrong symbols");
+                noteBatch = handleNoteBatch(terminal);
+            } catch (WrongInputException e) {
                 continue;
-            } catch (IOException e) {
-                e.printStackTrace();
-                continue;
+            } catch (QuitHandleException e) {
+                break;
             }
 
-            int noteCount = 0;
-            try {
-                String line = terminal.getLine(String.format("enter count of `%,d` notes", note.getAmount()));
-                noteCount = Integer.parseInt(line);
-            } catch (NumberFormatException e) {
-                terminal.writeln("Wrong count number");
-                continue;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (noteCount == 0) {
-                continue;
-            }
-            Machine.getInstance().putMoney(note, noteCount);
+            machine.putMoney(noteBatch.getNote(), noteBatch.getCount());
 
-            int money = noteCount * note.getAmount();
+            int money = noteBatch.getCount() * noteBatch.getNote().getAmount();
             terminal.writeln(String.format("Put %d", money));
             credit += money;
         }
@@ -85,13 +72,64 @@ public class PutMoneyIntoAccount implements Action {
         }
     }
 
-    @Override
-    public String help() {
-        return "Puts money into account";
+    private NoteBatch handleNoteBatch(Terminal terminal) throws WrongInputException, QuitHandleException {
+        int numberOfNote;
+        Note note;
+        try {
+            String line = terminal.getLine("enter the number").trim();
+            if (line.equals("q")) {
+                throw new QuitHandleException();
+            }
+            numberOfNote = Integer.parseInt(line);
+            note = notesChoice.get(numberOfNote);
+            if (note == null) {
+                terminal.writeln("Wrong note number");
+                throw new WrongInputException();
+            }
+        } catch (NumberFormatException e) {
+            terminal.writeln("Wrong symbols");
+            throw new WrongInputException();
+        } catch (IOException e) {
+            throw new WrongInputException();
+        }
+
+        int count = 0;
+        try {
+            String line = terminal.getLine(String.format("enter count of `%,d` notes", note.getAmount()));
+            count = Integer.parseInt(line);
+        } catch (NumberFormatException e) {
+            terminal.writeln("Wrong count number");
+            throw new WrongInputException();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (count == 0) {
+            throw new WrongInputException();
+        }
+        return new NoteBatch(note, count);
     }
 
-    @Override
-    public String formula() {
-        return "put";
+    class NoteBatch {
+        private final Note note;
+        private final int count;
+
+        NoteBatch(Note note, int count) {
+            this.note = note;
+            this.count = count;
+        }
+
+        int getCount() {
+            return count;
+        }
+
+        Note getNote() {
+            return note;
+        }
+    }
+
+    private class QuitHandleException extends Exception {
+    }
+
+    private class WrongInputException extends Exception {
     }
 }

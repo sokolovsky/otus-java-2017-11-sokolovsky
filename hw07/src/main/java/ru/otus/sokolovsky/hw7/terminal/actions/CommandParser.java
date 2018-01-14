@@ -12,7 +12,7 @@ public class CommandParser {
     private Action action;
 
     private final String PARAM_TYPE_STRING = "string";
-    private final String PARAM_TYPE_INT = "int";
+    private final String PARAM_TYPE_INT = "integer";
 
     public CommandParser(String name, Map<String, String> params, Action action) {
         this.name = name;
