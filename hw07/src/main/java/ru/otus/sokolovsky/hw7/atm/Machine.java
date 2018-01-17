@@ -29,7 +29,7 @@ public class Machine {
 
     public State createState() {
         State state = new State();
-        state.setCells(Collections.unmodifiableMap(cells));
+        state.setCells(getCellsInfo());
         return state;
     }
 
@@ -124,7 +124,9 @@ public class Machine {
     }
 
     public Map<Note, Integer> getCellsInfo() {
-        return Collections.unmodifiableMap(cells);
+        SortedMap<Note, Integer> copiedCells = new TreeMap<>();
+        cells.forEach(copiedCells::put);
+        return Collections.unmodifiableMap(copiedCells);
     }
 
     public Note getMinNote() {
