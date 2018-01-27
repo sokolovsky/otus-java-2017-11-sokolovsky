@@ -21,7 +21,7 @@ public class Analyzer {
     }).collect(Collectors.toSet());
 
     private Set<Class> arrayClasses = Arrays.stream(new Class[]{
-        Collection.class
+        List.class
     }).collect(Collectors.toSet());
 
     private Set<Class> objectClasses = Arrays.stream(new Class[]{
@@ -32,7 +32,7 @@ public class Analyzer {
         this.value = value;
     }
 
-    public Container createContainer() {
+    public Container analyze() {
         return walk(this.value);
     }
 
@@ -122,21 +122,30 @@ public class Analyzer {
         return list;
     }
 
-    private boolean instanceOfClass(Object value, Class<?> cl) {
+    private boolean instanceOf(Object value, Class<?> cl) {
         if (cl == Object.class) {
             return true;
         }
         Class iClass = value.getClass();
-        while (iClass != Object.class) {
-            if (iClass == cl) {
-                return true;
+        if (cl.isInterface()) {
+            for (Class cInterface : iClass.getInterfaces()) {
+                if (cInterface == cl) {
+                    return true;
+                }
             }
-            iClass = iClass.getSuperclass();
+        } else {
+            while (iClass != Object.class) {
+                if (iClass == cl) {
+                    return true;
+                }
+                iClass = iClass.getSuperclass();
+            }
         }
+
         return false;
     }
 
     private boolean instanceOfClasses(Object value, Set<Class> setOfClasses) {
-        return setOfClasses.stream().anyMatch(cl -> instanceOfClass(value, cl));
+        return setOfClasses.stream().anyMatch(cl -> instanceOf(value, cl));
     }
 }
