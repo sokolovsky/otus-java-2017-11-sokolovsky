@@ -21,11 +21,11 @@ public class JsonWriter {
 
     public static String parse(Object value) {
         Analyzer analyzer = new Analyzer(value);
-        Container container = analyzer.createContainer();
-        if (isPrimitive(container)) {
+        Container analyzedData = analyzer.analyze();
+        if (isPrimitive(analyzedData)) {
             return value.toString();
         }
-        return traverse(container).toJSONString();
+        return traverse(analyzedData).toJSONString();
     }
 
     public static JSONAware traverse(Container container) {
@@ -48,8 +48,8 @@ public class JsonWriter {
         for (Map.Entry<String, Container> entry : container.getMap().entrySet()) {
             Container iContainer = entry.getValue();
             Object value = iContainer.getValue();
-            if (isPrimitive(container)) {
-                value = traverse(container);
+            if (!isPrimitive(iContainer)) {
+                value = traverse(iContainer);
             }
             json.put(entry.getKey(), value);
         }
