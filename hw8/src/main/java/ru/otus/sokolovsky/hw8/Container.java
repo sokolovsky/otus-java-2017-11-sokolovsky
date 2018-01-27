@@ -21,10 +21,12 @@ class Container {
         return type;
     }
 
+    @SuppressWarnings("unchecked")
     Map<String, Container> getMap() {
         return (Map<String, Container>) data;
     }
 
+    @SuppressWarnings("unchecked")
     List<Container> getList() {
         return (List<Container>) data;
     }
