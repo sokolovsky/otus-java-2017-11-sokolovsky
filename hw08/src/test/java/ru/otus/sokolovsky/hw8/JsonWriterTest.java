@@ -7,6 +7,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -145,6 +146,27 @@ public class JsonWriterTest {
         assertThat(deserializedMap.size(), is(2));
         assertThat(deserializedMap.get("first").str, equalTo("first"));
         assertThat(deserializedMap.get("second").str, equalTo("second"));
+    }
+
+    @Test
+    public void arrayOfObjectsChecking() {
+        SampleObject first = new SampleObject();
+        first.str = "first";
+
+        SampleObject second = new SampleObject();
+        second.str = "second";
+
+        SampleObject[] array = new SampleObject[]{first, second};
+
+        String json = JsonWriter.parse(array);
+
+        Gson gson = new GsonBuilder().create();
+        array = gson.fromJson(json, SampleObject[].class);
+
+        assertThat(array.length, is(2));
+
+        assertThat(array[0], equalTo(first));
+        assertThat(array[1], equalTo(second));
     }
 
     private SampleObject deserializeSampleObject(String json) {
