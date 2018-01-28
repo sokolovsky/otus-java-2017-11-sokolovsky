@@ -1,6 +1,5 @@
 package ru.otus.sokolovsky.domain;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import ru.otus.sokolovsky.App;
 import ru.otus.sokolovsky.orm.Executor;
@@ -41,16 +40,13 @@ public class DataSetTest {
     }
 
     @Test
-    public void idle() {
-    }
-
-    @Test
     public void loadUser() throws SQLException {
         Executor executor = app().createExecutor();
         UserDataSet user = executor.load(userIds.get(0), UserDataSet.class);
 
-        assertThat(user.getName(), is("name"));
+        assertThat(user.getName(), is("Иван"));
         assertThat(user.getAge(), is(18));
+        assertThat(user.getId(), not(0));
     }
 
     @Test
@@ -67,7 +63,7 @@ public class DataSetTest {
                 (ResultSet resultSet) -> {
                     try {
                         assertThat(resultSet.getString("name"), is("Иннокентий"));
-                        assertThat(resultSet.getLong("age"), is(11));
+                        assertThat(resultSet.getInt("age"), is(11));
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -75,6 +71,7 @@ public class DataSetTest {
             );
     }
 
+    @Test
     public void createNewUser() throws SQLException {
         UserDataSet user = new UserDataSet();
         user.setName("Новый пользователь");
