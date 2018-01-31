@@ -1,6 +1,5 @@
 package ru.otus.sokolovsky.orm;
 
-import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.*;
