@@ -82,4 +82,19 @@ public class DataSetTest {
 
         assertThat(user.getId(), not(anyOf(nullValue(), is(0))));
     }
+
+    @Test
+    public void checkSqlInjection() throws SQLException {
+        Long firstId = userIds.get(0);
+        Executor executor = app().createExecutor();
+        UserDataSet user = executor.load(firstId, UserDataSet.class);
+
+        user.setName(String.format("Анатолий' where id=%d;\n select * from users where name='", firstId));
+        executor.save(user);
+
+        UserDataSet restoredUser = executor.load(firstId, UserDataSet.class);
+
+        assertThat(user, not(restoredUser));
+        assertThat(restoredUser.getName(), is("Анатолий' where id=1;\n select * from users where name='"));
+    }
 }
