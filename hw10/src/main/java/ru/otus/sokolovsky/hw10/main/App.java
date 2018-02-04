@@ -1,6 +1,9 @@
 package ru.otus.sokolovsky.hw10.main;
 
+import org.hibernate.cfg.Configuration;
+import ru.otus.sokolovsky.hw10.hibernateintegration.HibernateUserDBServiceImpl;
 import ru.otus.sokolovsky.hw10.myorm.SqlExecutor;
+import ru.otus.sokolovsky.hw10.myormintegration.UserDBServiceImpl;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -29,33 +32,15 @@ public class App {
 
     private static App app = new App();
     private static Connection connection;
+    private HibernateUserDBServiceImpl hibernateService;
+    private UserDBServiceImpl jdbcService;
 
     private Properties dbProps = new Properties();
     private Properties hibernateProps = new Properties();
 
     private App() {
-        try {
-            dbProps.load(getFileInputStream("db.properties"));
-            hibernateProps.load(getFileInputStream("hibernate.properties"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            Class<?> driverClass = getClass().getClassLoader().loadClass(dbProps.getProperty("driver"));
-            Driver driver = (Driver) driverClass.getConstructor().newInstance();
-            DriverManager.registerDriver(driver);
-
-            connection = DriverManager.getConnection(
-                    dbProps.getProperty("connection"),
-                    dbProps.getProperty("user"),
-                    dbProps.getProperty("pass")
-                );
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            throw new RuntimeException(e);
-        }
+        initJDBCConnection();
+        initHibernate();
     }
 
     public static App getApplication() {
@@ -88,14 +73,22 @@ public class App {
         });
     }
 
+    public HibernateUserDBServiceImpl getHibernateService() {
+        return hibernateService;
+    }
+
+    public UserDBServiceImpl getJdbcService() {
+        return jdbcService;
+    }
+
     private InputStream getFileInputStream(String fileName) throws FileNotFoundException {
-        ClassLoader classLoader = getClass().getClassLoader();
+        ClassLoader classLoader = getClassLoader();
         return new FileInputStream(Objects.requireNonNull(classLoader.getResource(fileName)).getFile());
     }
 
     private String getFileContent(String fileName) {
         StringBuilder result = new StringBuilder("");
-        ClassLoader classLoader = getClass().getClassLoader();
+        ClassLoader classLoader = getClassLoader();
         File file = new File(Objects.requireNonNull(classLoader.getResource(fileName)).getFile());
 
         try (Scanner scanner = new Scanner(file)) {
@@ -114,6 +107,62 @@ public class App {
 
     public SqlExecutor createExecutor() throws SQLException {
         return new SqlExecutor(getConnection());
+    }
+
+    private void initJDBCConnection() {
+        try {
+            dbProps.load(getFileInputStream("db.properties"));
+            hibernateProps.load(getFileInputStream("hibernate.properties"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            Class<?> driverClass = getClassLoader().loadClass(dbProps.getProperty("driver"));
+            Driver driver = (Driver) driverClass.getConstructor().newInstance();
+            DriverManager.registerDriver(driver);
+
+            connection = DriverManager.getConnection(
+                    dbProps.getProperty("connection"),
+                    dbProps.getProperty("user"),
+                    dbProps.getProperty("pass")
+            );
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            throw new RuntimeException(e);
+        }
+
+        jdbcService = new UserDBServiceImpl(connection);
+
+    }
+
+    private ClassLoader getClassLoader() {
+        return getClass().getClassLoader();
+    }
+
+    private void initHibernate() {
+        Configuration configuration = new Configuration();
+
+        Arrays.stream(hibernateProps.getProperty("domain.entities").split(","))
+                .map(String::trim).forEach(
+                        entity -> {
+                            try {
+                                configuration.addAnnotatedClass(Class.forName(entity));
+                            } catch (ClassNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    );
+
+        hibernateProps.entrySet().stream().filter(
+                e -> {
+                    String key = (String) e.getKey();
+                    return key.contains("hibernate.");
+                }
+            ).forEach(e -> configuration.setProperty((String) e.getKey(), (String) e.getValue()));
+
+        hibernateService = new HibernateUserDBServiceImpl(configuration);
     }
 
     private String getDbProperty(String name) {

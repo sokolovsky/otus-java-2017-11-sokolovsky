@@ -4,6 +4,8 @@ import ru.otus.sokolovsky.hw10.domain.UserDBService;
 import ru.otus.sokolovsky.hw10.domain.UserDataSet;
 import ru.otus.sokolovsky.hw10.myorm.DataSetDao;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +13,11 @@ import java.util.Map;
 public class UserDBServiceImpl implements UserDBService {
 
     private final DataSetDao<UserDataSet> dao;
+    private final Connection connection;
 
-    public UserDBServiceImpl(DataSetDao<UserDataSet> dao) {
-        this.dao = dao;
+    public UserDBServiceImpl(Connection connection) {
+        this.dao = new DataSetDao<>(connection);
+        this.connection = connection;
     }
 
     @Override
@@ -42,5 +46,10 @@ public class UserDBServiceImpl implements UserDBService {
 
     @Override
     public void shutdown() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS address (
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
+  user_id BIGINT(20) NOT NULL,
+  street VARCHAR(255),
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES `user`(id)
+) CHARACTER SET utf8 COLLATE utf8_general_ci;

@@ -1,4 +1,4 @@
-package ru.otus.sokolovsky.domain;
+package ru.otus.sokolovsky.hw10.domain;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,12 +6,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.otus.sokolovsky.hw10.domain.UserDBService;
-import ru.otus.sokolovsky.hw10.domain.UserDataSet;
 import ru.otus.sokolovsky.hw10.main.App;
-import ru.otus.sokolovsky.hw10.myorm.DataSetDao;
 import ru.otus.sokolovsky.hw10.myorm.SqlExecutor;
-import ru.otus.sokolovsky.hw10.myormintegration.UserDBServiceImpl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,11 +32,17 @@ class ImplementationsTest {
         createUsersExamples();
     }
 
+
+    @AfterEach
+    void tearDown() throws Exception {
+        app().dropDbTables();
+    }
+
     private void createUsersExamples() throws SQLException {
         String[] sqlStrings = {
-            "INSERT INTO users SET name=\"Иван\", age=18",
-            "INSERT INTO users SET name=\"Петр\", age=19",
-            "INSERT INTO users SET name=\"Николай\", age=20"
+            "INSERT INTO user SET name=\"Иван\", age=18",
+            "INSERT INTO user SET name=\"Петр\", age=19",
+            "INSERT INTO user SET name=\"Николай\", age=20"
         };
         Arrays.stream(sqlStrings).forEach(s -> {
             long id = 0;
@@ -54,13 +56,8 @@ class ImplementationsTest {
         });
     }
 
-    @AfterEach
-    void tearDown() throws Exception {
-        app().dropDbTables();
-    }
-
     static Stream<UserDBService> getAllOrmImplementations() throws SQLException {
-        return Stream.of(new UserDBServiceImpl(new DataSetDao(app().getConnection())));
+        return Stream.of(app().getJdbcService(), app().getHibernateService());
     }
 
     @ParameterizedTest
@@ -84,7 +81,7 @@ class ImplementationsTest {
         userDBService.save(user);
 
         SqlExecutor executor = app().createExecutor();
-        executor.execSelect("select * from users where id="+user.getId(),
+        executor.execSelect("select * from user where id="+user.getId(),
                 (ResultSet resultSet) -> {
                     try {
                         assertThat(resultSet.getString("name"), is("Иннокентий"));
