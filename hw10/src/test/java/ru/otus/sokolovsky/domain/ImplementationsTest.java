@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-class DataSetTest {
+class ImplementationsTest {
     private List<Long> userIds = new LinkedList<>();
 
     private static App app() {
@@ -123,9 +123,10 @@ class DataSetTest {
         assertThat(restoredUser.getName(), is("Анатолий' where id=1;\n select * from users where name='"));
     }
 
-    @Test
-    @Disabled
-    void shouldReadAllRecordsInDb() {
+    @ParameterizedTest
+    @MethodSource("getAllOrmImplementations")
+    void shouldReadAllRecordsInDb(UserDBService userDBService) {
+        assertThat(userDBService.readAll().size(), is(3));
     }
 
     @ParameterizedTest

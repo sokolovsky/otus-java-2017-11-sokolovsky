@@ -20,7 +20,7 @@ public class UserDBServiceImpl implements UserDBService {
     public List<UserDataSet> readByName(String name) {
         Map<String, Object> filter = new HashMap<>();
         filter.put("name", name);
-        return dao.loadByFields(filter, UserDataSet.class);
+        return dao.loadByFilter(filter, UserDataSet.class);
     }
 
     @Override
@@ -35,7 +35,9 @@ public class UserDBServiceImpl implements UserDBService {
 
     @Override
     public List<UserDataSet> readAll() {
-        return null;
+        Map<String, Object> filter = new HashMap<>();
+        filter.put("1", 1);
+        return dao.loadByFilter(filter, UserDataSet.class);
     }
 
     @Override

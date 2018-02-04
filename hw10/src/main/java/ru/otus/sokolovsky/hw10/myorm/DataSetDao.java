@@ -20,10 +20,10 @@ public class DataSetDao<T> {
     public T load(long id, Class<T> cl) {
         HashMap<String, Object> filter = new HashMap<>();
         filter.put("id", id);
-        return loadByFields(filter, cl).get(0);
+        return loadByFilter(filter, cl).get(0);
     }
 
-    public List<T> loadByFields(Map<String, Object> values, Class<T> cl) {
+    public List<T> loadByFilter(Map<String, Object> values, Class<T> cl) {
         EntityDefinition<T> definition = EntityDefinitionsRegister.getDefinition(cl);
         Supplier<T> createEmptyModel = () -> {
             T model;
