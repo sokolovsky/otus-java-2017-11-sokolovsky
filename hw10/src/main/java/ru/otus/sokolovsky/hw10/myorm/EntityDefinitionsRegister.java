@@ -1,5 +1,7 @@
 package ru.otus.sokolovsky.hw10.myorm;
 
+import ru.otus.sokolovsky.hw10.main.domain.DataSet;
+
 import java.util.HashMap;
 import java.util.Map;
 

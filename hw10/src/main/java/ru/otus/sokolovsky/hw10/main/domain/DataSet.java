@@ -1,4 +1,4 @@
-package ru.otus.sokolovsky.hw10.myorm;
+package ru.otus.sokolovsky.hw10.main.domain;
 
 import javax.persistence.*;
 

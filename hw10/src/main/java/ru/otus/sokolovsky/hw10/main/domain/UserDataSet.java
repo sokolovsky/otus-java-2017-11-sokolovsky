@@ -1,7 +1,5 @@
 package ru.otus.sokolovsky.hw10.main.domain;
 
-import ru.otus.sokolovsky.hw10.myorm.DataSet;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
