@@ -20,16 +20,40 @@ public class EntityDefinition<T> {
         Class iClass = cls;
         while (iClass != Object.class) {
             for (Field field : iClass.getDeclaredFields()) {
-                if (!field.isAnnotationPresent(Column.class)) {
-                    continue;
+                if (field.isAnnotationPresent(Column.class)) {
+                    columns.put(field.getName(), field);
                 }
-                columns.put(field.getName(), field);
                 if (field.isAnnotationPresent(Id.class)) {
+                    columns.put(field.getName(), field);
                     primaries.add(field);
                 }
             }
             iClass = iClass.getSuperclass();
         }
+    }
+
+    ValueContainer createContainerByValue(Object value) {
+        ValueContainer container = null;
+        Class<?> valueClass = value.getClass();
+        if (valueClass == Integer.class) {
+            container = new ValueContainer(ValueContainer.Type.INT, value);
+        }
+        if (valueClass == Long.class) {
+            container = new ValueContainer(ValueContainer.Type.LONG, value);
+        }
+        if (valueClass == Boolean.class) {
+            container = new ValueContainer(ValueContainer.Type.BOOL, value);
+        }
+        if (valueClass == Double.class) {
+            container = new ValueContainer(ValueContainer.Type.DOUBLE, value);
+        }
+        if (valueClass == Float.class) {
+            container = new ValueContainer(ValueContainer.Type.FLOAT, value);
+        }
+        if (valueClass == String.class) {
+            container = new ValueContainer(ValueContainer.Type.STRING, value);
+        }
+        return Objects.requireNonNull(container);
     }
 
     public Map<String, ValueContainer> getFieldsValues(T model) {
@@ -40,34 +64,13 @@ public class EntityDefinition<T> {
 
             ValueContainer container = null;
             try {
-                Object value = field.get(model);
-                Class<?> valueClass = value.getClass();
-                if (valueClass == Integer.class) {
-                    container = new ValueContainer(ValueContainer.Type.INT, value);
-                }
-                if (valueClass == Long.class) {
-                    container = new ValueContainer(ValueContainer.Type.LONG, value);
-                }
-                if (valueClass == Boolean.class) {
-                    container = new ValueContainer(ValueContainer.Type.BOOL, value);
-                }
-                if (valueClass == Double.class) {
-                    container = new ValueContainer(ValueContainer.Type.DOUBLE, value);
-                }
-                if (valueClass == Float.class) {
-                    container = new ValueContainer(ValueContainer.Type.FLOAT, value);
-                }
-                if (valueClass == String.class) {
-                    container = new ValueContainer(ValueContainer.Type.STRING, value);
-                }
+                container = createContainerByValue(field.get(model));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 continue;
             }
 
-            if (container == null) {
-                throw new RuntimeException(String.format("Type of column `%s` is not compatible", field.getName()));
-            }
+            Objects.requireNonNull(container, String.format("Type of column `%s` is not compatible", field.getName()));
             res.put(entry.getKey(), container);
         }
         return res;
@@ -109,6 +112,26 @@ public class EntityDefinition<T> {
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public long getPkValue(Object model) {
+        Field field = primaries.stream().findFirst().get();
+        field.setAccessible(true);
+        try {
+            return (long) field.get(model);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setPkValue(Object model, long pk) {
+        Field field = primaries.stream().findFirst().get();
+        field.setAccessible(true);
+        try {
+            field.set(model, pk);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -1,6 +1,6 @@
 package ru.otus.sokolovsky.hw10.main;
 
-import ru.otus.sokolovsky.hw10.myorm.Executor;
+import ru.otus.sokolovsky.hw10.myorm.SqlExecutor;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.Scanner;
 
  На основе ДЗ 9:
      1. Оформить решение в виде DBService (interface DBService, class DBServiceImpl, UsersDAO, UsersDataSet,
-     Executor)
+     SqlExecutor)
      2. Не меняя интерфейс DBSerivice сделать DBServiceHibernateImpl на Hibernate.
      3. Добавить в UsersDataSet поля:
          адресс (OneToOne)
@@ -48,17 +48,17 @@ public class App {
         return app;
     }
 
-    private Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         return connection;
     }
 
     public void createUsesTable() throws SQLException {
-        new Executor(getConnection())
+        new SqlExecutor(getConnection())
             .execUpdate(getFileContent("create_users_table.sql"));
     }
 
     public void dropUsersTable() throws SQLException {
-        new Executor(getConnection())
+        new SqlExecutor(getConnection())
                 .execUpdate(getFileContent("delete_users_table.sql"));
     }
 
@@ -81,7 +81,7 @@ public class App {
         return result.toString();
     }
 
-    public Executor createExecutor() throws SQLException {
-        return new Executor(getConnection());
+    public SqlExecutor createExecutor() throws SQLException {
+        return new SqlExecutor(getConnection());
     }
 }
