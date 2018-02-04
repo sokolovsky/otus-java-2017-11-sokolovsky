@@ -1,4 +1,4 @@
-package ru.otus.sokolovsky.hw10.main.domain;
+package ru.otus.sokolovsky.hw10.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

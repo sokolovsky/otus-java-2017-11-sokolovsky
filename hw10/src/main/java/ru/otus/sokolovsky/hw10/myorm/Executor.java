@@ -1,6 +1,6 @@
 package ru.otus.sokolovsky.hw10.myorm;
 
-import ru.otus.sokolovsky.hw10.main.domain.DataSet;
+import ru.otus.sokolovsky.hw10.domain.DataSet;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
