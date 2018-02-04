@@ -2,11 +2,10 @@ package ru.otus.sokolovsky.hw10.main;
 
 import ru.otus.sokolovsky.hw10.myorm.SqlExecutor;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 /**
 
@@ -27,20 +26,35 @@ import java.util.Scanner;
             можно не поддерживать в ДЗ 9
  */
 public class App {
-    private static final String DB_USER = "root";
-    private static final String DB_PASS = "";
 
     private static App app = new App();
     private static Connection connection;
 
+    private Properties dbProps = new Properties();
+    private Properties hibernateProps = new Properties();
+
     private App() {
         try {
-            Driver driver = new com.mysql.cj.jdbc.Driver();
+            dbProps.load(getFileInputStream("db.properties"));
+            hibernateProps.load(getFileInputStream("hibernate.properties"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            Class<?> driverClass = getClass().getClassLoader().loadClass(dbProps.getProperty("driver"));
+            Driver driver = (Driver) driverClass.getConstructor().newInstance();
             DriverManager.registerDriver(driver);
 
-            connection = DriverManager.getConnection("jdbc:mysql://localhost/otus", DB_USER, DB_PASS);
-        } catch (SQLException e) {
-            e.printStackTrace();
+            connection = DriverManager.getConnection(
+                    dbProps.getProperty("connection"),
+                    dbProps.getProperty("user"),
+                    dbProps.getProperty("pass")
+                );
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -52,14 +66,31 @@ public class App {
         return connection;
     }
 
-    public void createUsesTable() throws SQLException {
-        new SqlExecutor(getConnection())
-            .execUpdate(getFileContent("create_users_table.sql"));
+    public void createDbTables() throws SQLException {
+        SqlExecutor executor = createExecutor();
+        Arrays.stream(dbProps.getProperty("createTableFiles").split(",")).map(String::trim).forEach((file) -> {
+            try {
+                executor.execUpdate(getFileContent(file));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    public void dropUsersTable() throws SQLException {
-        new SqlExecutor(getConnection())
-                .execUpdate(getFileContent("delete_users_table.sql"));
+    public void dropDbTables() throws SQLException {
+        SqlExecutor executor = createExecutor();
+        Arrays.stream(dbProps.getProperty("dropTableFiles").split(",")).map(String::trim).forEach((file) -> {
+            try {
+                executor.execUpdate(getFileContent(file));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private InputStream getFileInputStream(String fileName) throws FileNotFoundException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        return new FileInputStream(Objects.requireNonNull(classLoader.getResource(fileName)).getFile());
     }
 
     private String getFileContent(String fileName) {
@@ -83,5 +114,13 @@ public class App {
 
     public SqlExecutor createExecutor() throws SQLException {
         return new SqlExecutor(getConnection());
+    }
+
+    private String getDbProperty(String name) {
+        return dbProps.getProperty(name);
+    }
+
+    private Map<String, String> getHibernatePropertyList() {
+        return null;
     }
 }

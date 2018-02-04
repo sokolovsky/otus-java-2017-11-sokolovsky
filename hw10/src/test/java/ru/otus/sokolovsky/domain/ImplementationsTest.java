@@ -32,7 +32,7 @@ class ImplementationsTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        app().createUsesTable();
+        app().createDbTables();
         createUsersExamples();
     }
 
@@ -56,7 +56,7 @@ class ImplementationsTest {
 
     @AfterEach
     void tearDown() throws Exception {
-        app().dropUsersTable();
+        app().dropDbTables();
     }
 
     static Stream<UserDBService> getAllOrmImplementations() throws SQLException {
