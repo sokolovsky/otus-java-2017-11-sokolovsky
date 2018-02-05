@@ -1,9 +1,6 @@
 package ru.otus.sokolovsky.hw10.domain;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import ru.otus.sokolovsky.hw10.main.App;
@@ -14,6 +11,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -29,36 +27,45 @@ class ImplementationsTest {
     @BeforeEach
     void setUp() throws Exception {
         app().createDbTables();
-        createUsersExamples();
+        createExamples();
     }
-
 
     @AfterEach
     void tearDown() throws Exception {
         app().dropDbTables();
     }
 
-    private void createUsersExamples() throws SQLException {
+    private void createExamples() throws SQLException {
         String[] sqlStrings = {
-            "INSERT INTO user SET name=\"Иван\", age=18",
-            "INSERT INTO user SET name=\"Петр\", age=19",
-            "INSERT INTO user SET name=\"Николай\", age=20"
+                "INSERT INTO address SET street=\"пл Комсомольская\", id=1",
+                "INSERT INTO address SET street=\"пл Комсомольская\", id=2",
+                "INSERT INTO user SET name=\"Иван\", age=18, address_id=1, id=1",
+                "INSERT INTO user SET name=\"Петр\", age=19, address_id=2, id=2",
+                "INSERT INTO user SET name=\"Николай\", age=20, id=3",
+                "INSERT INTO phone SET number=\"1234\", user_id=1",
+                "INSERT INTO phone SET number=\"4321\", user_id=1",
+
         };
         Arrays.stream(sqlStrings).forEach(s -> {
             long id = 0;
             try {
                 id = app().createExecutor().execInsert(s);
             } catch (SQLException e) {
-                e.printStackTrace();
-                return;
+                new RuntimeException(e);
             }
             userIds.add(id);
         });
     }
 
-    static Stream<UserDBService> getAllOrmImplementations() throws SQLException {
+    static Stream<UserDBService> getAllOrmImplementations() {
         return Stream.of(app().getJdbcService(), app().getHibernateService());
     }
+
+    static Stream<UserDBService> getHibernateOrmImplementations() {
+        return Stream.of(app().getHibernateService());
+    }
+
+
 
     @ParameterizedTest
     @MethodSource("getAllOrmImplementations")
@@ -115,7 +122,9 @@ class ImplementationsTest {
         userDBService.save(user);
 
         UserDataSet restoredUser = userDBService.read(firstId);
+        assertThat(user.getId(), is(firstId));
 
+        System.out.println(userDBService.readAll().size());
         assertThat(user, not(restoredUser));
         assertThat(restoredUser.getName(), is("Анатолий' where id=1;\n select * from users where name='"));
     }
@@ -133,23 +142,52 @@ class ImplementationsTest {
         assertThat(ivan.getAge(), is(18));
     }
 
-    @Test
-    @Disabled
-    void gettingDataSetWithOneToOneRelations() {
+    @ParameterizedTest
+    @MethodSource("getHibernateOrmImplementations")
+    void gettingDataSetWithOneToOneRelations(UserDBService userDBService) {
+        UserDataSet user = userDBService.read(1);
+        assertThat(user.getAddress().getStreet(), notNullValue());
     }
 
-    @Test
-    @Disabled
-    void savingDataSetWithOneToOneRelations() {
+    @ParameterizedTest
+    @MethodSource("getHibernateOrmImplementations")
+    void savingDataSetWithOneToOneRelations(UserDBService userDBService) {
+        UserDataSet user = userDBService.read(3);
+        assertThat(user.getAddress(), nullValue());
+
+        AddressDataSet address = new AddressDataSet();
+        address.setStreet("Some Street");
+        user.setAddress(address);
+        userDBService.save(user);
+
+        UserDataSet obtainedUser = userDBService.read(3);
+        assertThat(obtainedUser.getAddress().getStreet(), is("Some Street"));
+
     }
 
-    @Test
-    @Disabled
-    void gettingDataSetWithOneToManeRelations() {
+
+    @ParameterizedTest
+    @MethodSource("getHibernateOrmImplementations")
+    void gettingDataSetWithOneToManeRelations(UserDBService userDBService) {
+        UserDataSet user = userDBService.read(1);
+        assertThat(user.getPhones().size(), is(2));
+        assertThat(user.getPhones().get(0).getNumber(), is("1234"));
     }
 
-    @Test
-    @Disabled
-    void savingDataSetWithOneToManyRelations() {
+    @ParameterizedTest
+    @MethodSource("getHibernateOrmImplementations")
+    void savingDataSetWithOneToManyRelations(UserDBService userDBService) {
+        UserDataSet user = userDBService.read(2);
+        PhoneDataSet phoneDataSet = new PhoneDataSet();
+        phoneDataSet.setNumber("555");
+        user.addPhone(phoneDataSet);
+        userDBService.save(user);
+
+        UserDataSet obtainedUser = userDBService.read(2);
+        assertThat(
+                obtainedUser.getPhones().stream()
+                        .map(PhoneDataSet::getNumber).collect(Collectors.toList()),
+                hasItem("555")
+        );
     }
 }

@@ -14,13 +14,15 @@ public class UserDataSet extends DataSet {
 
     @Column
     private String name;
+
     @Column
     private int age;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToOne
+    @JoinColumn(name = "address_id")
     private AddressDataSet address;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<PhoneDataSet> phones = new LinkedList<>();
 
     public long getId() {
@@ -61,5 +63,6 @@ public class UserDataSet extends DataSet {
 
     public void addPhone(PhoneDataSet phone) {
         this.phones.add(phone);
+        phone.setOwner(this);
     }
 }

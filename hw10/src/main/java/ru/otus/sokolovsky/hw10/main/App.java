@@ -57,7 +57,7 @@ public class App {
             try {
                 executor.execUpdate(getFileContent(file));
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e.getMessage() + " " + file);
             }
         });
     }

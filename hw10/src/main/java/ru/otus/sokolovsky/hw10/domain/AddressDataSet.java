@@ -10,10 +10,6 @@ public class AddressDataSet extends DataSet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private UserDataSet user;
-
     @Column
     private String street;
 

@@ -41,12 +41,19 @@ public class HibernateUserDBServiceImpl implements UserDBService {
 
     @Override
     public void save(UserDataSet dataSet) {
-        putTransaction(session -> session.save(dataSet));
+        putTransaction(session -> {
+            session.saveOrUpdate(dataSet);
+            dataSet.getPhones().forEach(session::saveOrUpdate);
+            if (dataSet.getAddress() != null) {
+                session.saveOrUpdate(dataSet.getAddress());
+            }
+            return dataSet;
+        });
     }
 
     @Override
     public UserDataSet read(long id) {
-        return putTransaction(session -> session.load(UserDataSet.class, id));
+        return putTransaction(session -> session.get(UserDataSet.class, id));
     }
 
     @Override

@@ -31,4 +31,12 @@ public class PhoneDataSet extends DataSet {
     public void setNumber(String number) {
         this.number = number;
     }
+
+    public void setOwner(UserDataSet user) {
+        this.user = user;
+    }
+
+    public UserDataSet getOwner() {
+        return user;
+    }
 }
