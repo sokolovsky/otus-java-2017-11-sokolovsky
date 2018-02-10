@@ -3,14 +3,18 @@ package ru.otus.sokolovsky.hw10.domain;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import ru.otus.sokolovsky.hw10.hibernateintegration.HibernateUserDBServiceImpl;
 import ru.otus.sokolovsky.hw10.main.App;
 import ru.otus.sokolovsky.hw10.myorm.SqlExecutor;
+import ru.otus.sokolovsky.hw10.myormintegration.UserDBServiceImpl;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,6 +23,9 @@ import static org.junit.Assert.*;
 
 class ImplementationsTest {
     private List<Long> userIds = new LinkedList<>();
+    private static Connection connection;
+    private static UserDBServiceImpl jdbcService;
+    private static HibernateUserDBServiceImpl hibernateService;
 
     private static App app() {
         return App.getApplication();
@@ -26,13 +33,27 @@ class ImplementationsTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        app().createDbTables();
+        app().createDbTables(connection);
         createExamples();
     }
 
     @AfterEach
     void tearDown() throws Exception {
-        app().dropDbTables();
+        app().dropDbTables(connection);
+    }
+
+    @BeforeAll
+    static void createServices() {
+        connection = app().createConnection();
+        hibernateService = app().createUserHibernateService();
+        jdbcService = app().createUserJDBCService(connection);
+    }
+
+    @AfterAll
+    static void disposeServices() {
+        Stream.of(hibernateService, jdbcService).filter(Objects::nonNull).forEach(DBService::shutdown);
+        hibernateService = null;
+        jdbcService = null;
     }
 
     private void createExamples() throws SQLException {
@@ -48,8 +69,8 @@ class ImplementationsTest {
         };
         Arrays.stream(sqlStrings).forEach(s -> {
             long id = 0;
-            try {
-                id = app().createExecutor().execInsert(s);
+            try (Connection connection = app().createConnection()) {
+                id = app().createExecutor(connection).execInsert(s);
             } catch (SQLException e) {
                 new RuntimeException(e);
             }
@@ -58,14 +79,12 @@ class ImplementationsTest {
     }
 
     static Stream<UserDBService> getAllOrmImplementations() {
-        return Stream.of(app().getJdbcService(), app().getHibernateService());
+        return Stream.of(jdbcService, hibernateService);
     }
 
     static Stream<UserDBService> getHibernateOrmImplementations() {
-        return Stream.of(app().getHibernateService());
+        return Stream.of(hibernateService);
     }
-
-
 
     @ParameterizedTest
     @MethodSource("getAllOrmImplementations")
@@ -87,17 +106,19 @@ class ImplementationsTest {
 
         userDBService.save(user);
 
-        SqlExecutor executor = app().createExecutor();
-        executor.execSelect("select * from user where id="+user.getId(),
-                (ResultSet resultSet) -> {
-                    try {
-                        assertThat(resultSet.getString("name"), is("Иннокентий"));
-                        assertThat(resultSet.getInt("age"), is(11));
-                    } catch (SQLException e) {
-                        e.printStackTrace();
+        try(Connection connection = app().createConnection()) {
+            SqlExecutor executor = app().createExecutor(connection);
+            executor.execSelect("select * from user where id="+user.getId(),
+                    (ResultSet resultSet) -> {
+                        try {
+                            assertThat(resultSet.getString("name"), is("Иннокентий"));
+                            assertThat(resultSet.getInt("age"), is(11));
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
             );
+        }
     }
 
     @ParameterizedTest

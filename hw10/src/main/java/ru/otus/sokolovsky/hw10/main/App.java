@@ -6,7 +6,6 @@ import ru.otus.sokolovsky.hw10.myorm.SqlExecutor;
 import ru.otus.sokolovsky.hw10.myormintegration.UserDBServiceImpl;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
 import java.util.*;
 
@@ -31,28 +30,25 @@ import java.util.*;
 public class App {
 
     private static App app = new App();
-    private static Connection connection;
-    private HibernateUserDBServiceImpl hibernateService;
-    private UserDBServiceImpl jdbcService;
 
     private Properties dbProps = new Properties();
     private Properties hibernateProps = new Properties();
 
     private App() {
-        initJDBCConnection();
-        initHibernate();
+        try {
+            dbProps.load(getFileInputStream("db.properties"));
+            hibernateProps.load(getFileInputStream("hibernate.properties"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static App getApplication() {
         return app;
     }
 
-    public Connection getConnection() throws SQLException {
-        return connection;
-    }
-
-    public void createDbTables() throws SQLException {
-        SqlExecutor executor = createExecutor();
+    public void createDbTables(Connection connection) throws SQLException {
+        SqlExecutor executor = createExecutor(connection);
         Arrays.stream(dbProps.getProperty("createTableFiles").split(",")).map(String::trim).forEach((file) -> {
             try {
                 executor.execUpdate(getFileContent(file));
@@ -62,8 +58,8 @@ public class App {
         });
     }
 
-    public void dropDbTables() throws SQLException {
-        SqlExecutor executor = createExecutor();
+    public void dropDbTables(Connection connection) throws SQLException {
+        SqlExecutor executor = createExecutor(connection);
         Arrays.stream(dbProps.getProperty("dropTableFiles").split(",")).map(String::trim).forEach((file) -> {
             try {
                 executor.execUpdate(getFileContent(file));
@@ -71,14 +67,6 @@ public class App {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    public HibernateUserDBServiceImpl getHibernateService() {
-        return hibernateService;
-    }
-
-    public UserDBServiceImpl getJdbcService() {
-        return jdbcService;
     }
 
     private InputStream getFileInputStream(String fileName) throws FileNotFoundException {
@@ -105,43 +93,38 @@ public class App {
         return result.toString();
     }
 
-    public SqlExecutor createExecutor() throws SQLException {
-        return new SqlExecutor(getConnection());
+    public SqlExecutor createExecutor(Connection connection) throws SQLException {
+        if (connection.isClosed()) {
+            throw new RuntimeException("Connection must be opened");
+        }
+        return new SqlExecutor(connection);
     }
 
-    private void initJDBCConnection() {
-        try {
-            dbProps.load(getFileInputStream("db.properties"));
-            hibernateProps.load(getFileInputStream("hibernate.properties"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+    public Connection createConnection() {
         try {
             Class<?> driverClass = getClassLoader().loadClass(dbProps.getProperty("driver"));
             Driver driver = (Driver) driverClass.getConstructor().newInstance();
             DriverManager.registerDriver(driver);
 
-            connection = DriverManager.getConnection(
+            return DriverManager.getConnection(
                     dbProps.getProperty("connection"),
                     dbProps.getProperty("user"),
                     dbProps.getProperty("pass")
             );
-        } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
 
-        jdbcService = new UserDBServiceImpl(connection);
-
+    public UserDBServiceImpl createUserJDBCService(Connection connection) {
+        return new UserDBServiceImpl(connection);
     }
 
     private ClassLoader getClassLoader() {
         return getClass().getClassLoader();
     }
 
-    private void initHibernate() {
+    public HibernateUserDBServiceImpl createUserHibernateService() {
         Configuration configuration = new Configuration();
 
         Arrays.stream(hibernateProps.getProperty("domain.entities").split(","))
@@ -162,14 +145,6 @@ public class App {
                 }
             ).forEach(e -> configuration.setProperty((String) e.getKey(), (String) e.getValue()));
 
-        hibernateService = new HibernateUserDBServiceImpl(configuration);
-    }
-
-    private String getDbProperty(String name) {
-        return dbProps.getProperty(name);
-    }
-
-    private Map<String, String> getHibernatePropertyList() {
-        return null;
+        return new HibernateUserDBServiceImpl(configuration);
     }
 }
