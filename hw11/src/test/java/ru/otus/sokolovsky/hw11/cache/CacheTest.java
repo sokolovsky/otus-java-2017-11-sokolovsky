@@ -96,15 +96,34 @@ class CacheTest {
 
     @Test
     void lifeTimeOfData() throws Exception {
+        class HandleTimer implements Supplier<Long> {
+            private long time = 0;
+
+            private void setTime(long time) {
+                this.time = time;
+            }
+            @Override
+            public Long get() {
+                return time;
+            }
+        }
+        HandleTimer handleTimer = new HandleTimer();
         try (Cache<String, Integer> cache = getCache()) {
-            cache.setLifeTime(1);
+            cache.setTimeProducer(handleTimer);
+            cache.setLifeTime(100);
             cache.put("1", 1);
             cache.put("2", 1);
             cache.put("3", 1);
             cache.put("4", 1);
 
+            handleTimer.setTime(50);
+            Thread.sleep(100);
+
             assertThat(cache.get("1"), notNullValue());
-            Thread.sleep(2001);
+
+            handleTimer.setTime(101);
+            Thread.sleep(100);
+
             assertThat(cache.get("1"), nullValue());
         }
     }

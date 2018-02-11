@@ -37,7 +37,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
         public void run() {
             while (true) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(50);
 
                     if (!isActive) {
                         continue;

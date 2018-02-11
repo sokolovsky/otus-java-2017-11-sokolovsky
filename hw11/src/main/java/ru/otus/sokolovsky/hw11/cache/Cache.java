@@ -1,8 +1,12 @@
 package ru.otus.sokolovsky.hw11.cache;
 
+import java.util.function.Supplier;
+
 public interface Cache<K, V> extends AutoCloseable {
 
     void setLifeTime(long seconds);
+
+    void setTimeProducer(Supplier<Long> producer);
 
     void setVolume(int count);
 
