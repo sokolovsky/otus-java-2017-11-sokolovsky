@@ -6,8 +6,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import ru.otus.sokolovsky.hw11.cache.Cache;
+import ru.otus.sokolovsky.hw11.cache.CacheRepository;
 import ru.otus.sokolovsky.hw11.main.App;
 import ru.otus.sokolovsky.hw11.myorm.SqlExecutor;
+import ru.otus.sokolovsky.hw11.myormintegration.HoleyCache;
 import ru.otus.sokolovsky.hw11.myormintegration.UserDBServiceImpl;
 
 import java.sql.Connection;
@@ -35,11 +38,14 @@ class ImplementationsTest {
     void setUp() throws Exception {
         app().createDbTables(connection);
         createExamples();
+        // setting up for previous tests
+        jdbcService.setCache(new HoleyCache<>());
     }
 
     @AfterEach
     void tearDown() throws Exception {
         app().dropDbTables(connection);
+        CacheRepository.getInstance().clear("test");
     }
 
     @BeforeAll
@@ -54,7 +60,7 @@ class ImplementationsTest {
         jdbcService = null;
     }
 
-    private void createExamples() throws SQLException {
+    private void createExamples() {
         String[] sqlStrings = {
                 "INSERT INTO address SET street=\"пл Комсомольская\", id=1",
                 "INSERT INTO address SET street=\"пл Комсомольская\", id=2",
@@ -66,23 +72,23 @@ class ImplementationsTest {
 
         };
         Arrays.stream(sqlStrings).forEach(s -> {
-            long id = 0;
+            long id;
             try (Connection connection = app().createConnection()) {
                 id = app().createExecutor(connection).execInsert(s);
             } catch (SQLException e) {
-                new RuntimeException(e);
+                throw new RuntimeException(e);
             }
             userIds.add(id);
         });
     }
 
-    static Stream<UserDBService> getAllOrmImplementations() {
+    private static Stream<UserDBService> getOrmImplementation() {
         return Stream.of(jdbcService);
     }
 
     @ParameterizedTest
-    @MethodSource("getAllOrmImplementations")
-    void loadUser(UserDBService userDBService) throws SQLException {
+    @MethodSource("getOrmImplementation")
+    void loadUser(UserDBService userDBService) {
         UserDataSet user = userDBService.read(userIds.get(0));
 
         assertThat(user.getName(), is("Иван"));
@@ -91,7 +97,7 @@ class ImplementationsTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getAllOrmImplementations")
+    @MethodSource("getOrmImplementation")
     void changeUser(UserDBService userDBService) throws SQLException {
         UserDataSet user = userDBService.read(userIds.get(2));
 
@@ -116,8 +122,8 @@ class ImplementationsTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getAllOrmImplementations")
-    void createNewUser(UserDBService userDBService) throws SQLException {
+    @MethodSource("getOrmImplementation")
+    void createNewUser(UserDBService userDBService) {
         UserDataSet user = new UserDataSet();
         user.setName("Новый пользователь");
         user.setAge(20);
@@ -128,8 +134,8 @@ class ImplementationsTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getAllOrmImplementations")
-    void checkSqlInjection(UserDBService userDBService) throws SQLException {
+    @MethodSource("getOrmImplementation")
+    void checkSqlInjection(UserDBService userDBService) {
         Long firstId = userIds.get(0);
         UserDataSet user = userDBService.read(firstId);
 
@@ -139,21 +145,70 @@ class ImplementationsTest {
         UserDataSet restoredUser = userDBService.read(firstId);
         assertThat(user.getId(), is(firstId));
 
-        System.out.println(userDBService.readAll().size());
         assertThat(user, not(restoredUser));
         assertThat(restoredUser.getName(), is("Анатолий' where id=1;\n select * from users where name='"));
     }
 
     @ParameterizedTest
-    @MethodSource("getAllOrmImplementations")
+    @MethodSource("getOrmImplementation")
     void shouldReadAllRecordsInDb(UserDBService userDBService) {
         assertThat(userDBService.readAll().size(), is(3));
     }
 
     @ParameterizedTest
-    @MethodSource("getAllOrmImplementations")
+    @MethodSource("getOrmImplementation")
     void shouldSearchUserByName(UserDBService userDBService) {
         UserDataSet ivan = userDBService.readByName("Иван").get(0);
         assertThat(ivan.getAge(), is(18));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getOrmImplementation")
+    void shouldGetFromCache(UserDBService userDBService) {
+        Cache<Long, UserDataSet> cache = getCache();
+        userDBService.setCache(cache);
+        UserDataSet ivan = userDBService.readByName("Иван").get(0);
+
+        userDBService.read(ivan.getId());
+        assertThat(cache.hitCount(), is(1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getOrmImplementation")
+    void shouldUpdateCache(UserDBService userDBService) {
+        Cache<Long, UserDataSet> cache = getCache();
+        userDBService.setCache(cache);
+        UserDataSet ivan = userDBService.readByName("Иван").get(0);
+
+        assertThat(cache.hitCount(), is(0));
+        ivan.setName("Ваня");
+        userDBService.save(ivan);
+
+        UserDataSet updatedIvan = userDBService.read(ivan.getId());
+        assertThat(cache.hitCount(), is(1));
+        assertThat(updatedIvan, sameInstance(ivan));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getOrmImplementation")
+    void shouldSaveNewInstanceInCache(UserDBService userDBService) {
+        Cache<Long, UserDataSet> cache = getCache();
+        userDBService.setCache(cache);
+
+        UserDataSet user = new UserDataSet();
+        user.setName("Новый пользователь");
+        user.setAge(20);
+
+        userDBService.save(user);
+
+        assertThat(user.getId(), allOf(notNullValue(), not(0)));
+        assertThat(cache.hitCount(), is(0));
+
+        userDBService.read(user.getId());
+        assertThat(cache.hitCount(), is(1));
+    }
+
+    private Cache<Long, UserDataSet> getCache() {
+        return CacheRepository.getInstance().getCache("test");
     }
 }

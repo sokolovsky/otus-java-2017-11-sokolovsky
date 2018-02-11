@@ -23,6 +23,7 @@ public class DataSetDao<T> {
         return loadByFilter(filter, cl).get(0);
     }
 
+    @SuppressWarnings("unchecked")
     public List<T> loadByFilter(Map<String, Object> values, Class<T> cl) {
         EntityDefinition<T> definition = EntityDefinitionsRegister.getDefinition(cl);
         Supplier<T> createEmptyModel = () -> {
@@ -64,6 +65,7 @@ public class DataSetDao<T> {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     public void save(T model) {
         EntityDefinition<T> definition = EntityDefinitionsRegister.getDefinition(model.getClass());
         Map<String, ValueContainer> values = definition.getFieldsValues(model);

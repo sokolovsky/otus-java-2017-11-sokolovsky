@@ -16,12 +16,13 @@ public class CacheRepository {
         return instance;
     }
 
-    public <V> Cache<String, V> getCache(String name) {
+    @SuppressWarnings("unchecked")
+    public <K, V> Cache<K, V> getCache(String name) {
         Objects.requireNonNull(name);
         if (!repo.containsKey(name)) {
             repo.put(name, CacheRepository.<V>createCache());
         }
-        return (Cache<String, V>) repo.get(name);
+        return (Cache<K, V>) repo.get(name);
     }
 
     public void clear(String name) {

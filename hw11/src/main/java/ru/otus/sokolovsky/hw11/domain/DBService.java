@@ -1,5 +1,7 @@
 package ru.otus.sokolovsky.hw11.domain;
 
+import ru.otus.sokolovsky.hw11.cache.Cache;
+
 import java.util.List;
 
 public interface DBService<E extends DataSet> {
@@ -11,4 +13,6 @@ public interface DBService<E extends DataSet> {
     List<E> readAll();
 
     void shutdown();
+
+    void setCache(Cache<Long, E> cache);
 }

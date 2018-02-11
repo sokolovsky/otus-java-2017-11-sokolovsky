@@ -73,7 +73,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
     private int hitCount;
     private int missCount;
 
-    public CacheImpl() {
+    CacheImpl() {
         timeServantThread = new Thread(timeServant);
         timeServantThread.start();
     }
@@ -135,7 +135,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         storage = new LinkedHashMap<>(volume);
         timeServantThread.interrupt();
     }
