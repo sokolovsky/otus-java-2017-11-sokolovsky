@@ -1,7 +1,5 @@
 package ru.otus.sokolovsky.hw11.main;
 
-import org.hibernate.cfg.Configuration;
-import ru.otus.sokolovsky.hw11.hibernateintegration.HibernateUserDBServiceImpl;
 import ru.otus.sokolovsky.hw11.myorm.SqlExecutor;
 import ru.otus.sokolovsky.hw11.myormintegration.UserDBServiceImpl;
 
@@ -32,12 +30,10 @@ public class App {
     private static App app = new App();
 
     private Properties dbProps = new Properties();
-    private Properties hibernateProps = new Properties();
 
     private App() {
         try {
             dbProps.load(getFileInputStream("db.properties"));
-            hibernateProps.load(getFileInputStream("hibernate.properties"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -122,29 +118,5 @@ public class App {
 
     private ClassLoader getClassLoader() {
         return getClass().getClassLoader();
-    }
-
-    public HibernateUserDBServiceImpl createUserHibernateService() {
-        Configuration configuration = new Configuration();
-
-        Arrays.stream(hibernateProps.getProperty("domain.entities").split(","))
-                .map(String::trim).forEach(
-                        entity -> {
-                            try {
-                                configuration.addAnnotatedClass(Class.forName(entity));
-                            } catch (ClassNotFoundException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    );
-
-        hibernateProps.entrySet().stream().filter(
-                e -> {
-                    String key = (String) e.getKey();
-                    return key.contains("hibernate.");
-                }
-            ).forEach(e -> configuration.setProperty((String) e.getKey(), (String) e.getValue()));
-
-        return new HibernateUserDBServiceImpl(configuration);
     }
 }

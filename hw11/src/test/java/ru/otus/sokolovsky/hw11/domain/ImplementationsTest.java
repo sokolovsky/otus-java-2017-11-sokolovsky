@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.otus.sokolovsky.hw11.hibernateintegration.HibernateUserDBServiceImpl;
 import ru.otus.sokolovsky.hw11.main.App;
 import ru.otus.sokolovsky.hw11.myorm.SqlExecutor;
 import ru.otus.sokolovsky.hw11.myormintegration.UserDBServiceImpl;
@@ -18,7 +17,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -28,7 +26,6 @@ class ImplementationsTest {
     private List<Long> userIds = new LinkedList<>();
     private static Connection connection;
     private static UserDBServiceImpl jdbcService;
-    private static HibernateUserDBServiceImpl hibernateService;
 
     private static App app() {
         return App.getApplication();
@@ -48,14 +45,12 @@ class ImplementationsTest {
     @BeforeAll
     static void createServices() {
         connection = app().createConnection();
-        hibernateService = app().createUserHibernateService();
         jdbcService = app().createUserJDBCService(connection);
     }
 
     @AfterAll
     static void disposeServices() {
-        Stream.of(hibernateService, jdbcService).filter(Objects::nonNull).forEach(DBService::shutdown);
-        hibernateService = null;
+        Stream.of(jdbcService).filter(Objects::nonNull).forEach(DBService::shutdown);
         jdbcService = null;
     }
 
@@ -82,11 +77,7 @@ class ImplementationsTest {
     }
 
     static Stream<UserDBService> getAllOrmImplementations() {
-        return Stream.of(jdbcService, hibernateService);
-    }
-
-    static Stream<UserDBService> getHibernateOrmImplementations() {
-        return Stream.of(hibernateService);
+        return Stream.of(jdbcService);
     }
 
     @ParameterizedTest
@@ -164,54 +155,5 @@ class ImplementationsTest {
     void shouldSearchUserByName(UserDBService userDBService) {
         UserDataSet ivan = userDBService.readByName("Иван").get(0);
         assertThat(ivan.getAge(), is(18));
-    }
-
-    @ParameterizedTest
-    @MethodSource("getHibernateOrmImplementations")
-    void gettingDataSetWithOneToOneRelations(UserDBService userDBService) {
-        UserDataSet user = userDBService.read(1);
-        assertThat(user.getAddress().getStreet(), notNullValue());
-    }
-
-    @ParameterizedTest
-    @MethodSource("getHibernateOrmImplementations")
-    void savingDataSetWithOneToOneRelations(UserDBService userDBService) {
-        UserDataSet user = userDBService.read(3);
-        assertThat(user.getAddress(), nullValue());
-
-        AddressDataSet address = new AddressDataSet();
-        address.setStreet("Some Street");
-        user.setAddress(address);
-        userDBService.save(user);
-
-        UserDataSet obtainedUser = userDBService.read(3);
-        assertThat(obtainedUser.getAddress().getStreet(), is("Some Street"));
-
-    }
-
-
-    @ParameterizedTest
-    @MethodSource("getHibernateOrmImplementations")
-    void gettingDataSetWithOneToManeRelations(UserDBService userDBService) {
-        UserDataSet user = userDBService.read(1);
-        assertThat(user.getPhones().size(), is(2));
-        assertThat(user.getPhones().get(0).getNumber(), is("1234"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("getHibernateOrmImplementations")
-    void savingDataSetWithOneToManyRelations(UserDBService userDBService) {
-        UserDataSet user = userDBService.read(2);
-        PhoneDataSet phoneDataSet = new PhoneDataSet();
-        phoneDataSet.setNumber("555");
-        user.addPhone(phoneDataSet);
-        userDBService.save(user);
-
-        UserDataSet obtainedUser = userDBService.read(2);
-        assertThat(
-                obtainedUser.getPhones().stream()
-                        .map(PhoneDataSet::getNumber).collect(Collectors.toList()),
-                hasItem("555")
-        );
     }
 }
