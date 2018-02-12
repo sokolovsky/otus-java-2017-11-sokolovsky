@@ -12,6 +12,10 @@ public class HoleyCache<E extends DataSet> implements Cache<Long, E> {
     }
 
     @Override
+    public void setIdleTime(long seconds) {
+    }
+
+    @Override
     public void setTimeProducer(Supplier<Long> producer) {
     }
 

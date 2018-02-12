@@ -7,29 +7,53 @@ import java.util.function.Supplier;
 public class CacheImpl<K, V> implements Cache<K, V> {
 
     private enum Event {
-        ADD_ITEM
+        ADD_ITEM, GET_ITEM
     }
 
     private class TimeServant implements Runnable {
         private long lifeTime = 0;
-        private LinkedHashMap<K, Long> records = new LinkedHashMap<>();
-        private boolean isActive = false;
+        private long idleTime = 0;
+
+        private LinkedHashMap<K, Long> werePut = new LinkedHashMap<>();
+        private LinkedHashMap<K, Long> wereGot = new LinkedHashMap<>();
 
         void setLifeTime(long seconds) {
             lifeTime = seconds;
         }
 
-        void activate() {
-            isActive = true;
-        }
-
-        void sleep() {
-            isActive = false;
+        void setIdleTime(long seconds) {
+            idleTime = seconds;
         }
 
         void notify(Event e, K itemKey) {
             if (e == Event.ADD_ITEM) {
-                records.put(itemKey, fNow.get());
+                werePut.put(itemKey, fNow.get());
+                wereGot.put(itemKey, fNow.get());
+            }
+            if (e == Event.GET_ITEM) {
+                wereGot.put(itemKey, fNow.get());
+            }
+        }
+
+        boolean needIdleHandle() {
+            return idleTime > 0;
+        }
+
+        boolean needLifeTimeHandle() {
+            return lifeTime > 0;
+        }
+
+        void removeItemsByTime(LinkedHashMap<K, Long> store, Long now, long lifeTime) {
+            Iterator<Map.Entry<K, Long>> iterator = store.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<K, Long> entry = iterator.next();
+                Long time = entry.getValue();
+                if (time + lifeTime < now) {
+                    storage.remove(entry.getKey());
+                    iterator.remove();
+                    continue;
+                }
+                break;
             }
         }
 
@@ -39,20 +63,14 @@ public class CacheImpl<K, V> implements Cache<K, V> {
                 try {
                     Thread.sleep(50);
 
-                    if (!isActive) {
-                        continue;
-                    }
                     Long now = fNow.get();
-                    Iterator<Map.Entry<K, Long>> iterator = records.entrySet().iterator();
-                    while (iterator.hasNext()) {
-                        Map.Entry<K, Long> entry = iterator.next();
-                        Long time = entry.getValue();
-                        if (time + lifeTime < now) {
-                            storage.remove(entry.getKey());
-                            iterator.remove();
-                            continue;
-                        }
-                        break;
+
+                    if (needLifeTimeHandle()) {
+                        removeItemsByTime(werePut, now, lifeTime);
+                    }
+
+                    if (needIdleHandle()) {
+                        removeItemsByTime(wereGot, now, idleTime);
                     }
 
                 } catch (InterruptedException e) {
@@ -81,7 +99,11 @@ public class CacheImpl<K, V> implements Cache<K, V> {
     @Override
     public void setLifeTime(long seconds) {
         timeServant.setLifeTime(seconds);
-        timeServant.activate();
+    }
+
+    @Override
+    public void setIdleTime(long seconds) {
+        timeServant.setIdleTime(seconds);
     }
 
     public void setTimeProducer(Supplier<Long> producer) {
@@ -116,6 +138,7 @@ public class CacheImpl<K, V> implements Cache<K, V> {
         } else {
             missCount++;
         }
+        timeServant.notify(Event.GET_ITEM, key);
         return val;
     }
 

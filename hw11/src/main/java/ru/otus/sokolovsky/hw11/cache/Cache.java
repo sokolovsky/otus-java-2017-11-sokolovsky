@@ -6,6 +6,8 @@ public interface Cache<K, V> extends AutoCloseable {
 
     void setLifeTime(long seconds);
 
+    void setIdleTime(long seconds);
+
     void setTimeProducer(Supplier<Long> producer);
 
     void setVolume(int count);

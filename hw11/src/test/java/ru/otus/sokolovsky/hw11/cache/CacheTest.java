@@ -9,6 +9,18 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 class CacheTest {
 
+    static class HandleTimer implements Supplier<Long> {
+        private long time = 0;
+
+        private void addTime(long time) {
+            this.time += time;
+        }
+        @Override
+        public Long get() {
+            return time;
+        }
+    }
+
     private Cache<String, Integer> getCache() {
         return CacheRepository.getInstance().getCache("test");
     }
@@ -95,17 +107,6 @@ class CacheTest {
 
     @Test
     void lifeTimeOfData() throws Exception {
-        class HandleTimer implements Supplier<Long> {
-            private long time = 0;
-
-            private void setTime(long time) {
-                this.time = time;
-            }
-            @Override
-            public Long get() {
-                return time;
-            }
-        }
         HandleTimer handleTimer = new HandleTimer();
         try (Cache<String, Integer> cache = getCache()) {
             cache.setTimeProducer(handleTimer);
@@ -115,15 +116,64 @@ class CacheTest {
             cache.put("3", 1);
             cache.put("4", 1);
 
-            handleTimer.setTime(50);
+            handleTimer.addTime(50);
             Thread.sleep(100);
 
             assertThat(cache.get("1"), notNullValue());
 
-            handleTimer.setTime(101);
+            handleTimer.addTime(101);
             Thread.sleep(100);
 
             assertThat(cache.get("1"), nullValue());
+        }
+    }
+
+    @Test
+    void checkingIdleTimeAfterPutting() throws Exception {
+        HandleTimer handleTimer = new HandleTimer();
+        try (Cache<String, Integer> cache = getCache()) {
+            cache.setTimeProducer(handleTimer);
+            cache.setIdleTime(100);
+            cache.put("1", 1);
+            cache.put("2", 1);
+
+            handleTimer.addTime(50);
+            Thread.sleep(100);
+
+            assertThat(cache.get("1"), notNullValue());
+
+            handleTimer.addTime(101);
+            Thread.sleep(100);
+
+            assertThat(cache.get("1"), nullValue());
+        }
+    }
+
+    @Test
+    void checkingIdleTimeAfterGetting() throws Exception {
+        HandleTimer handleTimer = new HandleTimer();
+        try (Cache<String, Integer> cache = getCache()) {
+            cache.setTimeProducer(handleTimer);
+            cache.setIdleTime(100);
+            cache.put("1", 1);
+            cache.put("2", 1);
+
+
+            handleTimer.addTime(50);
+            Thread.sleep(100);
+
+            assertThat(cache.get("2"), notNullValue());
+
+            cache.get("2");
+            handleTimer.addTime(80);
+            Thread.sleep(100);
+
+            assertThat(cache.get("2"), notNullValue());
+
+            handleTimer.addTime(101);
+            Thread.sleep(100);
+
+            assertThat(cache.get("2"), nullValue());
         }
     }
 }
