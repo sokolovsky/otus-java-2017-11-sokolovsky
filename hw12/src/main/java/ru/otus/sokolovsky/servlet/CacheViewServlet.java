@@ -10,5 +10,6 @@ public class CacheViewServlet extends RenderedServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Utils.responseOk(resp);
         req.getSession();
+        render(resp.getWriter());
     }
 }

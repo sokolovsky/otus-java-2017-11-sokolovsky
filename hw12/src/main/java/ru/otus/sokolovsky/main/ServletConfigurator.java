@@ -1,7 +1,6 @@
 package ru.otus.sokolovsky.main;
 
 import org.eclipse.jetty.servlet.ServletHolder;
-import ru.otus.sokolovsky.servlet.RenderedServlet;
 
 import javax.servlet.http.HttpServlet;
 import java.util.function.Consumer;

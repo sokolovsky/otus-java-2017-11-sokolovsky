@@ -5,6 +5,7 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
+import ru.otus.sokolovsky.db.Accounts;
 import ru.otus.sokolovsky.filters.AuthFilter;
 import ru.otus.sokolovsky.renderer.Rendered;
 import ru.otus.sokolovsky.renderer.Renderer;
@@ -17,10 +18,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -29,13 +28,13 @@ import java.util.Properties;
      Сделать админскую страницу, на которой админ должен авторизоваться и получить доступ к параметрам и состоянию кэша.
  */
 public class App {
-    private static final Renderer renderer = new Renderer("templates/layout.html");
+    private static final Renderer renderer = new Renderer("templates/layout.ftl");
 
     private final static Map<String, ServletHolder> siteMap = new HashMap<String, ServletHolder>() {{
         put("/login", forConfigure(new LoginServlet()).toDo((s) -> {
                 Rendered r = (Rendered) s;
                 r.setRenderer(renderer);
-                r.setTemplate("/templates/login.html".replace("/", File.separator));
+                r.setTemplate("/templates/login.ftl".replace("/", File.separator));
             }).getHolder());
 
         put("/static/*", forConfigure(new DefaultServlet()).withHolder(h -> {
@@ -48,15 +47,16 @@ public class App {
         put("/", forConfigure(new CacheViewServlet()).toDo(s -> {
                 Rendered r = (Rendered) s;
                 r.setRenderer(renderer);
-                r.setTemplate("templates/cache_view.html".replace("/", File.separator));
+                r.setTemplate("templates/cache_view.ftl".replace("/", File.separator));
             }).withHolder(h -> {
                 h.setInitParameter("dirAllowed","true");
             }).getHolder());
     }};
 
     public static void main(String[] args) throws Exception {
-        Resource assets = Resource.newResource(resourcePath("assets"));
+        initAccounts();
 
+        Resource assets = Resource.newResource(resourcePath("assets"));
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setBaseResource(assets);
         siteMap.forEach((k, v) -> context.addServlet(v, k));
@@ -67,6 +67,19 @@ public class App {
 
         server.start();
         server.join();
+    }
+
+    private static void initAccounts() {
+        String users = property("users");
+        String[] usersArray = users.split(",\\s*");
+        Arrays.stream(usersArray)
+                .map(s -> s
+                        .replaceAll("]", "")
+                        .replaceAll("\\[", ""))
+                .forEach(s -> {
+                    List<String> user = Arrays.stream(s.split("\\|")).map(String::trim).collect(Collectors.toList());
+                    Accounts.instance.add(user.get(0), user.get(1));
+                });
     }
 
     private static String property(String name) {
