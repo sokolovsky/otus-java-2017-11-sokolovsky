@@ -18,16 +18,12 @@ public class LoginServlet extends RenderedServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
-        // return the form
-        render(resp.getWriter());
+        Utils.responseOk(resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
-        // check post
-        // redirect to hash
+        Utils.responseOk(resp);
     }
 
     String generateHash(String pass) {

@@ -3,25 +3,35 @@ package ru.otus.sokolovsky.main;
 import org.eclipse.jetty.servlet.ServletHolder;
 import ru.otus.sokolovsky.servlet.RenderedServlet;
 
+import javax.servlet.http.HttpServlet;
 import java.util.function.Consumer;
 
 public class ServletConfigurator {
-    private RenderedServlet servlet;
+    private HttpServlet servlet;
+    private ServletHolder holder;
 
-    public ServletConfigurator(RenderedServlet servlet) {
+    public ServletConfigurator(HttpServlet servlet) {
         this.servlet = servlet;
     }
 
-    public ServletConfigurator toDo(Consumer<RenderedServlet> action) {
+    public ServletConfigurator toDo(Consumer<HttpServlet> action) {
         action.accept(servlet);
         return this;
     }
 
-    public RenderedServlet getServlet() {
+    public ServletConfigurator withHolder(Consumer<ServletHolder> action) {
+        action.accept(getHolder());
+        return this;
+    }
+
+    public HttpServlet getServlet() {
         return servlet;
     }
 
-    public ServletHolder createHolder() {
-        return new ServletHolder(servlet);
+    public ServletHolder getHolder() {
+        if (holder == null) {
+            holder = new ServletHolder(servlet);
+        }
+        return holder;
     }
 }
