@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class LoginServlet extends RenderedServlet {
 
@@ -26,6 +27,13 @@ public class LoginServlet extends RenderedServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String login = req.getParameter(LOGIN_PARAM);
         String pass = Utils.generateHash(req.getParameter(PASSWORD_PARAM));
+        if (Objects.isNull(login)) {
+            render(resp.getWriter(), new HashMap<String, Object>() {{
+                put("error", "Login is needed not empty");
+            }});
+            Utils.responseOk(resp);
+            return;
+        }
 
         if (Accounts.instance.hasPassword(login, pass)) {
             req.getSession().setAttribute("login", login);
