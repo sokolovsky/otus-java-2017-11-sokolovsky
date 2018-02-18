@@ -12,7 +12,7 @@ import java.util.Map;
 abstract public class RenderedServlet extends HttpServlet implements Rendered {
 
     private Renderer renderer;
-    private URL template;
+    private String template;
 
     @Override
     public void setRenderer(Renderer renderer) {
@@ -25,16 +25,16 @@ abstract public class RenderedServlet extends HttpServlet implements Rendered {
     }
 
     @Override
-    public void setTemplate(URL template) {
-        this.template = template;
+    public void setTemplate(String path) {
+        this.template = path;
     }
 
     @Override
     public void render(Writer out, Map<String, Object> values) {
-        renderer.forPage(template, values);
+        renderer.forPage(template, values).render(out);
     }
 
     public void render(Writer out) {
-        renderer.forPage(template, new HashMap<>());
+        render(out, new HashMap<>());
     }
 }

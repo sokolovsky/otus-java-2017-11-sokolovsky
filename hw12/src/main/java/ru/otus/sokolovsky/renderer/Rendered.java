@@ -9,7 +9,7 @@ public interface Rendered {
 
     Renderer getRenderer();
 
-    void setTemplate(URL template);
+    void setTemplate(String template);
 
     void render(Writer out, Map<String, Object> values);
 }

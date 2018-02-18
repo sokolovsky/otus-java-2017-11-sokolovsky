@@ -1,35 +1,41 @@
 package ru.otus.sokolovsky.main;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
+import ru.otus.sokolovsky.filters.AuthFilter;
 import ru.otus.sokolovsky.renderer.Rendered;
 import ru.otus.sokolovsky.renderer.Renderer;
 import ru.otus.sokolovsky.servlet.CacheViewServlet;
 import ru.otus.sokolovsky.servlet.LoginServlet;
-import ru.otus.sokolovsky.servlet.RenderedServlet;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServlet;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+
+/**
+     ДЗ-12: Веб сервер
+     Встроить веб сервер в приложение из ДЗ-11.
+     Сделать админскую страницу, на которой админ должен авторизоваться и получить доступ к параметрам и состоянию кэша.
+ */
 public class App {
-    private static final Renderer renderer = new Renderer(resourcePath("/templates/layout.html"));
+    private static final Renderer renderer = new Renderer("templates/layout.html");
 
     private final static Map<String, ServletHolder> siteMap = new HashMap<String, ServletHolder>() {{
         put("/login", forConfigure(new LoginServlet()).toDo((s) -> {
                 Rendered r = (Rendered) s;
                 r.setRenderer(renderer);
-                r.setTemplate(resourcePath("/templates/login.html".replace("/", File.separator)));
+                r.setTemplate("/templates/login.html".replace("/", File.separator));
             }).getHolder());
 
         put("/static/*", forConfigure(new DefaultServlet()).withHolder(h -> {
@@ -42,7 +48,7 @@ public class App {
         put("/", forConfigure(new CacheViewServlet()).toDo(s -> {
                 Rendered r = (Rendered) s;
                 r.setRenderer(renderer);
-                r.setTemplate(resourcePath("/templates/cache_view.html".replace("/", File.separator)));
+                r.setTemplate("templates/cache_view.html".replace("/", File.separator));
             }).withHolder(h -> {
                 h.setInitParameter("dirAllowed","true");
             }).getHolder());
@@ -54,6 +60,7 @@ public class App {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setBaseResource(assets);
         siteMap.forEach((k, v) -> context.addServlet(v, k));
+        context.addFilter(AuthFilter.class, "/", EnumSet.of(DispatcherType.REQUEST));
 
         Server server = new Server(Integer.parseInt(property("port")));
         server.setHandler(context);

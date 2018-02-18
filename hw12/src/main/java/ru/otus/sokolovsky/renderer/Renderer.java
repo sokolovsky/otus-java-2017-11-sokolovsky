@@ -12,16 +12,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Renderer {
-    private URL layout;
+    private String layout;
+    private String page;
     private Configuration configuration = new Configuration();
-    private URL page;
     private Map<String, Object> params;
 
-    public Renderer(URL layout) {
+    public Renderer(String layout) {
         this.layout = layout;
     }
 
-    public Renderer forPage(URL page, Map<String, Object> params) {
+    public Renderer forPage(String page, Map<String, Object> params) {
         this.page = page;
         this.params = params;
         return this;
@@ -29,10 +29,10 @@ public class Renderer {
 
     public void render(Writer writer) {
         try (Writer stream = new StringWriter()) {
-            Template contentTemplate = configuration.getTemplate(page.getPath());
+            Template contentTemplate = configuration.getTemplate(page);
             contentTemplate.process(params, stream);
 
-            Template layoutTemplate = configuration.getTemplate(layout.getPath());
+            Template layoutTemplate = configuration.getTemplate(layout);
             layoutTemplate.process(new HashMap<String, String>() {
                 {
                     put("body", stream.toString());

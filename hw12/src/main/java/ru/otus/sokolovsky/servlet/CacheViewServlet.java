@@ -9,6 +9,6 @@ public class CacheViewServlet extends RenderedServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Utils.responseOk(resp);
-        System.out.println("cache");
+        req.getSession();
     }
 }

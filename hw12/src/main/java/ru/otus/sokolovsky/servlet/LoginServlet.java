@@ -19,6 +19,7 @@ public class LoginServlet extends RenderedServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Utils.responseOk(resp);
+        render(resp.getWriter());
     }
 
     @Override
