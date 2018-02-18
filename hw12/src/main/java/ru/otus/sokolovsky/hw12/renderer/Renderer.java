@@ -1,4 +1,4 @@
-package ru.otus.sokolovsky.renderer;
+package ru.otus.sokolovsky.hw12.renderer;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -7,7 +7,6 @@ import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 

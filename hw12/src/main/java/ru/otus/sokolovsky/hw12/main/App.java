@@ -1,16 +1,19 @@
-package ru.otus.sokolovsky.main;
+package ru.otus.sokolovsky.hw12.main;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
-import ru.otus.sokolovsky.db.Accounts;
-import ru.otus.sokolovsky.filters.AuthFilter;
-import ru.otus.sokolovsky.renderer.Rendered;
-import ru.otus.sokolovsky.renderer.Renderer;
-import ru.otus.sokolovsky.servlet.CacheViewServlet;
-import ru.otus.sokolovsky.servlet.LoginServlet;
+import ru.otus.sokolovsky.hw12.cache.Cache;
+import ru.otus.sokolovsky.hw12.cache.CacheRepository;
+import ru.otus.sokolovsky.hw12.db.Accounts;
+import ru.otus.sokolovsky.hw12.filters.AuthFilter;
+import ru.otus.sokolovsky.hw12.servlet.CacheViewServlet;
+import ru.otus.sokolovsky.hw12.servlet.LoginServlet;
+import ru.otus.sokolovsky.hw12.renderer.Rendered;
+import ru.otus.sokolovsky.hw12.renderer.Renderer;
+import ru.otus.sokolovsky.hw12.servlet.Utils;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServlet;
@@ -55,6 +58,7 @@ public class App {
 
     public static void main(String[] args) throws Exception {
         initAccounts();
+        initCache();
 
         Resource assets = Resource.newResource(resourcePath("assets"));
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -67,6 +71,28 @@ public class App {
 
         server.start();
         server.join();
+    }
+
+    private static void initCache() {
+        Cache<Object, Object> cache = CacheRepository.getInstance().getCache(CacheRepository.COMMON_DATA);
+        cache.setLifeTime(5);
+        Accounts.instance.getData().forEach(cache::put);
+        new Thread(new Runnable() {
+            int counter = 0;
+            @Override
+            public void run() {
+                while (true) {
+                    for (int i = 0; i <= 3; i++) {
+                        cache.put(counter++, Utils.generateHash(counter + ""));
+                    }
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+            }
+        }).start();
     }
 
     private static void initAccounts() {

@@ -1,11 +1,10 @@
-package ru.otus.sokolovsky.servlet;
+package ru.otus.sokolovsky.hw12.servlet;
 
-import ru.otus.sokolovsky.renderer.Rendered;
-import ru.otus.sokolovsky.renderer.Renderer;
+import ru.otus.sokolovsky.hw12.renderer.Rendered;
+import ru.otus.sokolovsky.hw12.renderer.Renderer;
 
 import javax.servlet.http.HttpServlet;
 import java.io.Writer;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 

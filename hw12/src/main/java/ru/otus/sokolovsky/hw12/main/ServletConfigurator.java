@@ -1,4 +1,4 @@
-package ru.otus.sokolovsky.main;
+package ru.otus.sokolovsky.hw12.main;
 
 import org.eclipse.jetty.servlet.ServletHolder;
 

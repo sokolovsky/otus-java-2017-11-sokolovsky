@@ -9,6 +9,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://v4-alpha.getbootstrap.com/dist/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://v4-alpha.getbootstrap.com/examples/signin/signin.css">
+    <link rel="stylesheet" href="https://v4-alpha.getbootstrap.com/examples/grid/grid.css">
 </head>
 <body>
     ${body}

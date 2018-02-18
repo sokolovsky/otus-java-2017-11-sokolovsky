@@ -1,4 +1,4 @@
-package ru.otus.sokolovsky.filters;
+package ru.otus.sokolovsky.hw12.filters;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;

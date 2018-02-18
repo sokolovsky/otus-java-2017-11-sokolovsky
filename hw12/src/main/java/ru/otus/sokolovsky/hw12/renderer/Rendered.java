@@ -1,7 +1,6 @@
-package ru.otus.sokolovsky.renderer;
+package ru.otus.sokolovsky.hw12.renderer;
 
 import java.io.Writer;
-import java.net.URL;
 import java.util.Map;
 
 public interface Rendered {
