@@ -33,7 +33,7 @@ abstract public class RenderedServlet extends HttpServlet implements Rendered {
         renderer.forPage(template, values).render(out);
     }
 
-    public void render(Writer out) {
+    void render(Writer out) {
         render(out, new HashMap<>());
     }
 }

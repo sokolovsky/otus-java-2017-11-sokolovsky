@@ -4,6 +4,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.log.StdErrLog;
 import org.eclipse.jetty.util.resource.Resource;
 import ru.otus.sokolovsky.hw12.cache.Cache;
 import ru.otus.sokolovsky.hw12.cache.CacheRepository;
@@ -18,8 +20,8 @@ import ru.otus.sokolovsky.hw12.servlet.Utils;
 import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServlet;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +44,7 @@ public class App {
 
         put("/static/*", forConfigure(new DefaultServlet()).withHolder(h -> {
             h.setName("static");
-            h.setInitParameter("resourceBase", resourcePath("assets").getPath());
+            h.setInitParameter("resourceBase", resourcePath("assets").toExternalForm());
             h.setInitParameter("dirAllowed","true");
             h.setInitParameter("pathInfoOnly","true");
         }).getHolder());
@@ -60,13 +62,14 @@ public class App {
         initAccounts();
         initCache();
 
-        Resource assets = Resource.newResource(resourcePath("assets"));
+        Resource assets = Resource.newResource(resourcePath("assets").toExternalForm());
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setBaseResource(assets);
         siteMap.forEach((k, v) -> context.addServlet(v, k));
         context.addFilter(AuthFilter.class, "/", EnumSet.of(DispatcherType.REQUEST));
 
         Server server = new Server(Integer.parseInt(property("port")));
+        Log.setLog(new StdErrLog());
         server.setHandler(context);
 
         server.start();
@@ -111,7 +114,7 @@ public class App {
     private static String property(String name) {
         try {
             Properties properties = new Properties();
-            properties.load(new FileInputStream(new File(resourcePath("project.properties").getFile())));
+            properties.load(getResourceAsStream("project.properties"));
             return (String) properties.get(name);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -121,6 +124,11 @@ public class App {
     private static URL resourcePath(String path) {
         ClassLoader classLoader = App.class.getClassLoader();
         return classLoader.getResource(path);
+    }
+
+    private static InputStream getResourceAsStream(String path) {
+        ClassLoader classLoader = App.class.getClassLoader();
+        return classLoader.getResourceAsStream(path);
     }
 
     private static ServletConfigurator forConfigure(HttpServlet servlet) {
