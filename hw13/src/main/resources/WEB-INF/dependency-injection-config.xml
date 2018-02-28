@@ -1,0 +1,26 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations" value="project.properties" />
+    </bean>
+
+    <bean id="accountsCache" class="ru.otus.sokolovsky.hw13.cache.CacheImpl">
+        <property name="idleTime" value="5"/>
+        <property name="lifeTime" value="5"/>
+        <property name="volume" value="10"/>
+    </bean>
+    <bean id="cacheGenerator" class="ru.otus.sokolovsky.hw13.cache.CacheGenerator">
+        <constructor-arg name="cache" ref="accountsCache" />
+    </bean>
+    <bean id="renderer" class="ru.otus.sokolovsky.hw13.renderer.Renderer">
+        <constructor-arg name="layout" value="/templates/layout" />
+    </bean>
+    <bean id="accounts" class="ru.otus.sokolovsky.hw13.db.Accounts"/>
+    <bean id="templates" class="ru.otus.sokolovsky.hw13.servlet.TemplatesDataSource">
+        <property name="login" value="${templates.login}"/>
+        <property name="cache" value="${templates.cache}"/>
+    </bean>
+</beans>

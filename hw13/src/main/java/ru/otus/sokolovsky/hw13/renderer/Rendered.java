@@ -4,7 +4,6 @@ import java.io.Writer;
 import java.util.Map;
 
 public interface Rendered {
-    void setRenderer(Renderer renderer);
 
     Renderer getRenderer();
 
