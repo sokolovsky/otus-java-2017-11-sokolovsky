@@ -13,4 +13,4 @@
         </div>
     </#list>
 </div>
-<script type="text/javascript" src="/static/js/refresh.js"></script>
+<script type="text/javascript" src="/assets/js/refresh.js"></script>

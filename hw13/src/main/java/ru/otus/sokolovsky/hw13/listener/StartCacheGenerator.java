@@ -1,33 +1,22 @@
 package ru.otus.sokolovsky.hw13.listener;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import ru.otus.sokolovsky.hw13.db.Accounts;
-import ru.otus.sokolovsky.hw13.provider.UsersProvider;
+import ru.otus.sokolovsky.hw13.cache.CacheGenerator;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 @Component
-public class InitAccounts implements ServletContextListener {
+public class StartCacheGenerator implements ServletContextListener {
 
     @Autowired
-    private Accounts accounts;
-
-    @Autowired
-    private UsersProvider usersProvider;
+    private CacheGenerator cacheGenerator;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-        initAccounts();
-    }
-
-    private void initAccounts() {
-        usersProvider.getRecords().forEach((k, v) -> {
-            accounts.add(k, v);
-        });
+        cacheGenerator.start();
     }
 }

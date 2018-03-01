@@ -1,19 +1,11 @@
 package ru.otus.sokolovsky.hw13.servlet;
 
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import ru.otus.sokolovsky.hw13.db.Accounts;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+import org.springframework.beans.factory.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -49,6 +41,8 @@ public class LoginServlet extends RenderedServlet {
             resp.sendRedirect("/");
             return;
         }
+
+        System.out.println(accounts.getData().size());
 
         render(resp.getWriter(), new HashMap<String, Object>() {{
             put("error", "User with sent data doesn't exist");

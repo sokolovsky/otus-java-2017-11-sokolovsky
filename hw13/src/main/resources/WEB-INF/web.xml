@@ -26,16 +26,10 @@
     <servlet-mapping>
         <servlet-name>loginServlet</servlet-name>
         <url-pattern>/login</url-pattern>
-        <init-param>
-            <param-name>contextConfigLocation</param-name>
-            <param-value>
-                /WEB-INF/dependency-injection-config.xml
-            </param-value>
-        </init-param>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>cacheViewServlet</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern></url-pattern>
     </servlet-mapping>
     <filter-mapping>
         <filter-name>auth</filter-name>
@@ -43,10 +37,13 @@
     </filter-mapping>
 
     <listener>
-        <listener-class>ru.otus.sokolovsky.hw13.listener.InitAccounts</listener-class>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
     <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+        <listener-class>ru.otus.sokolovsky.hw13.listener.StartCacheGenerator</listener-class>
+    </listener>
+    <listener>
+        <listener-class>ru.otus.sokolovsky.hw13.listener.InitAccounts</listener-class>
     </listener>
     <context-param>
         <param-name>contextConfigLocation</param-name>
