@@ -18,6 +18,7 @@ public class Renderer {
 
     public Renderer(String layout) {
         this.layout = layout;
+        configuration.setClassForTemplateLoading(getClass(), "/");
     }
 
     public Renderer forPage(String page, Map<String, Object> params) {

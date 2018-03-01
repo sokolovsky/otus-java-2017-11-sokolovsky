@@ -2,10 +2,11 @@ package ru.otus.sokolovsky.hw13.servlet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import ru.otus.sokolovsky.hw13.renderer.Rendered;
 import ru.otus.sokolovsky.hw13.renderer.Renderer;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import java.io.Writer;
 import java.util.HashMap;
@@ -18,6 +19,15 @@ abstract public class RenderedServlet extends HttpServlet implements Rendered {
     private Renderer renderer;
 
     private String template;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+        // it`s not what I want, but Spring not ensure methods for post processing
+        String template = getServletConfig().getInitParameter("template");
+        setTemplate(template);
+    }
 
     @Override
     public Renderer getRenderer() {

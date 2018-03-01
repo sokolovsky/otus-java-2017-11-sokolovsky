@@ -1,14 +1,19 @@
 package ru.otus.sokolovsky.hw13.servlet;
 
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import ru.otus.sokolovsky.hw13.db.Accounts;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -20,12 +25,6 @@ public class LoginServlet extends RenderedServlet {
 
     @Autowired
     private Accounts accounts;
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -55,12 +54,5 @@ public class LoginServlet extends RenderedServlet {
             put("error", "User with sent data doesn't exist");
         }});
         Utils.responseOk(resp);
-    }
-
-    @Override
-    @Autowired
-    public void setTemplate(@Value("#{templates.login}") String template) {
-        System.out.println(template + "===============");
-        super.setTemplate(template);
     }
 }
