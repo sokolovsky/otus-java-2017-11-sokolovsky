@@ -22,4 +22,18 @@
     <bean id="usersProvider" class="ru.otus.sokolovsky.hw13.provider.UsersProvider">
         <constructor-arg name="str" value="${users}" />
     </bean>
+    <bean id="dbConnection" class="ru.otus.sokolovsky.hw13.myorm.ConnectionBuilder" factory-method="build">
+        <constructor-arg name="connStr" value="${jdbc.connection}" />
+        <constructor-arg name="driverDefinition" value="${jdbc.driver}" />
+        <constructor-arg name="user" value="${jdbc.user}" />
+        <constructor-arg name="pass" value="${jdbc.pass}" />
+    </bean>
+    <bean id="sqlExecutor" class="ru.otus.sokolovsky.hw13.myorm.SqlExecutor">
+        <constructor-arg name="connection" ref="dbConnection" />
+    </bean>
+    <bean id="databaseBuilder" class="ru.otus.sokolovsky.hw13.provider.DatabaseBuilder">
+        <constructor-arg name="createSqlFiles" value="${createTableFiles}"/>
+        <constructor-arg name="dropSqlFiles" value="${dropTableFiles}"/>
+        <constructor-arg name="executor" ref="sqlExecutor"/>
+    </bean>
 </beans>

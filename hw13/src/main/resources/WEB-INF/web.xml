@@ -40,6 +40,9 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
     <listener>
+        <listener-class>ru.otus.sokolovsky.hw13.listener.CreateDbTables</listener-class>
+    </listener>
+    <listener>
         <listener-class>ru.otus.sokolovsky.hw13.listener.StartCacheGenerator</listener-class>
     </listener>
     <listener>
