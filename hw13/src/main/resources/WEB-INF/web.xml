@@ -48,6 +48,9 @@
     <listener>
         <listener-class>ru.otus.sokolovsky.hw13.listener.InitAccounts</listener-class>
     </listener>
+    <listener>
+        <listener-class>ru.otus.sokolovsky.hw13.listener.InitDbUsers</listener-class>
+    </listener>
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
