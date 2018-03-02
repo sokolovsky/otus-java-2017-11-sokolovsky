@@ -16,7 +16,15 @@
         <servlet-class>ru.otus.sokolovsky.hw13.servlet.CacheViewServlet</servlet-class>
         <init-param>
             <param-name>template</param-name>
-            <param-value>templates/cache_view.ftl</param-value>
+            <param-value>templates/list_view.ftl</param-value>
+        </init-param>
+    </servlet>
+    <servlet>
+        <servlet-name>usersViewServlet</servlet-name>
+        <servlet-class>ru.otus.sokolovsky.hw13.servlet.DbUsersViewServlet</servlet-class>
+        <init-param>
+            <param-name>template</param-name>
+            <param-value>templates/list_view.ftl</param-value>
         </init-param>
     </servlet>
     <filter>
@@ -31,9 +39,14 @@
         <servlet-name>cacheViewServlet</servlet-name>
         <url-pattern></url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>usersViewServlet</servlet-name>
+        <url-pattern>/users</url-pattern>
+    </servlet-mapping>
     <filter-mapping>
         <filter-name>auth</filter-name>
         <servlet-name>cacheViewServlet</servlet-name>
+        <servlet-name>usersViewServlet</servlet-name>
     </filter-mapping>
 
     <listener>
