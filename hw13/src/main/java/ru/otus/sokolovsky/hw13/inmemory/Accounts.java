@@ -1,4 +1,4 @@
-package ru.otus.sokolovsky.hw13.db;
+package ru.otus.sokolovsky.hw13.inmemory;
 
 import java.util.HashMap;
 import java.util.Map;

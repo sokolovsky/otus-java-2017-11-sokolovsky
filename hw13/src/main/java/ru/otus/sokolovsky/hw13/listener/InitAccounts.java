@@ -1,10 +1,9 @@
 package ru.otus.sokolovsky.hw13.listener;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import ru.otus.sokolovsky.hw13.db.Accounts;
+import ru.otus.sokolovsky.hw13.inmemory.Accounts;
 import ru.otus.sokolovsky.hw13.provider.UsersProvider;
 
 import javax.servlet.ServletContextEvent;

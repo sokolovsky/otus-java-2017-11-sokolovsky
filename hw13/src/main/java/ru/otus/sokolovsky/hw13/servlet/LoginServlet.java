@@ -1,6 +1,6 @@
 package ru.otus.sokolovsky.hw13.servlet;
 
-import ru.otus.sokolovsky.hw13.db.Accounts;
+import ru.otus.sokolovsky.hw13.inmemory.Accounts;
 
 import org.springframework.beans.factory.annotation.*;
 import javax.servlet.http.HttpServletRequest;
