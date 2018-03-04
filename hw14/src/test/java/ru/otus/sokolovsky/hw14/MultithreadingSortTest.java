@@ -32,7 +32,7 @@ class MultithreadingSortTest {
         int[] ints = IntStream.rangeClosed(0, 1000_000).toArray();
         shuffleArray(ints);
 
-        MultithreadingSort sort = new MultithreadingSort(1);
+        MultithreadingSort sort = new MultithreadingSort(4);
         sort.execute(ints);
 
         for (int i = 0; i <= 1000_000; i++) {
