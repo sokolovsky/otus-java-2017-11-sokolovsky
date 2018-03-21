@@ -5,7 +5,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-9">
                 <ul class="nav navbar-nav">
                     <li><a href="/">Users</a></li>
-                    <li><a href="/chat">Messages</a></li>
+                    <li><a href="/chat">Chat room</a></li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
@@ -28,4 +28,3 @@
         </tbody>
     </table>
 </div>
-<script type="text/javascript" src="/assets/js/refresh.js"></script>
