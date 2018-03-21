@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <web-xapp>
-    <display-name>HW13</display-name>
+    <display-name>HW15</display-name>
     <description>Project WAR file</description>
     <servlet>
         <servlet-name>loginServlet</servlet-name>
@@ -19,6 +19,14 @@
             <param-value>templates/list_view.ftl</param-value>
         </init-param>
     </servlet>
+    <servlet>
+        <servlet-name>chatServlet</servlet-name>
+        <servlet-class>ru.otus.sokolovsky.hw15.servlet.ChatInitServlet</servlet-class>
+        <init-param>
+            <param-name>template</param-name>
+            <param-value>templates/chat.ftl</param-value>
+        </init-param>
+    </servlet>
     <filter>
         <filter-name>auth</filter-name>
         <filter-class>ru.otus.sokolovsky.hw15.filters.AuthFilter</filter-class>
@@ -28,6 +36,10 @@
         <url-pattern>/login</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>chatServlet</servlet-name>
+        <url-pattern>/chat</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>usersViewServlet</servlet-name>
         <url-pattern></url-pattern>
     </servlet-mapping>
@@ -35,7 +47,6 @@
         <filter-name>auth</filter-name>
         <servlet-name>usersViewServlet</servlet-name>
     </filter-mapping>
-
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>

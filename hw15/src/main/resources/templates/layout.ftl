@@ -14,12 +14,12 @@
 
     <!-- Optional theme -->
     <link rel="stylesheet" href="/assets/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="/assets/js/jquery-3.3.1.min.js"></script>
 </head>
 <body>
     ${body}
 
     <!-- jQuery first, then Tether, then Bootstrap JS. -->
-    <script src="/assets/js/jquery-3.1.1.slim.min.js"></script>
     <script src="/assets/js/tether.min.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>
 </body>

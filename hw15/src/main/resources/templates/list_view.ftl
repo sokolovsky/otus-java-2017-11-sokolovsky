@@ -5,7 +5,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-9">
                 <ul class="nav navbar-nav">
                     <li><a href="/">Users</a></li>
-                    <li><a href="/messages">Messages</a></li>
+                    <li><a href="/chat">Messages</a></li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
