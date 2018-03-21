@@ -1,0 +1,34 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations" value="project.properties"/>
+    </bean>
+
+    <bean id="renderer" class="ru.otus.sokolovsky.hw15.renderer.Renderer">
+        <constructor-arg name="layout" value="templates/layout.ftl" />
+    </bean>
+    <bean id="accounts" class="ru.otus.sokolovsky.hw15.inmemory.Accounts"/>
+    <bean id="usersProvider" class="ru.otus.sokolovsky.hw15.provider.UsersProvider">
+        <constructor-arg name="str" value="${users}" />
+    </bean>
+    <bean id="dbConnection" class="ru.otus.sokolovsky.hw15.myorm.ConnectionBuilder" factory-method="build">
+        <constructor-arg name="connStr" value="${jdbc.connection}" />
+        <constructor-arg name="driverDefinition" value="${jdbc.driver}" />
+        <constructor-arg name="user" value="${jdbc.user}" />
+        <constructor-arg name="pass" value="${jdbc.pass}" />
+    </bean>
+    <bean id="sqlExecutor" class="ru.otus.sokolovsky.hw15.myorm.SqlExecutor">
+        <constructor-arg name="connection" ref="dbConnection" />
+    </bean>
+    <bean id="databaseBuilder" class="ru.otus.sokolovsky.hw15.provider.DatabaseBuilder">
+        <constructor-arg name="createSqlFiles" value="${createTableFiles}"/>
+        <constructor-arg name="dropSqlFiles" value="${dropTableFiles}"/>
+        <constructor-arg name="executor" ref="sqlExecutor"/>
+    </bean>
+    <bean id="userDbService" class="ru.otus.sokolovsky.hw15.myormintegration.UserDBServiceImpl" >
+        <constructor-arg name="connection" ref="dbConnection" />
+    </bean>
+</beans>
