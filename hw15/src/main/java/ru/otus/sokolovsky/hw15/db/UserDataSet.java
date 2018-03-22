@@ -1,4 +1,6 @@
-package ru.otus.sokolovsky.hw15.domain;
+package ru.otus.sokolovsky.hw15.db;
+
+import ru.otus.sokolovsky.hw15.domain.DataSet;
 
 import javax.persistence.*;
 import java.util.LinkedList;
@@ -18,12 +20,8 @@ public class UserDataSet extends DataSet {
     @Column
     private int age;
 
-    @OneToOne
-    @JoinColumn(name = "address_id")
-    private AddressDataSet address;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private List<PhoneDataSet> phones = new LinkedList<>();
+    private List<ChatMessageDataSet> messages = new LinkedList<>();
 
     public long getId() {
         return id;
@@ -49,20 +47,12 @@ public class UserDataSet extends DataSet {
         this.age = age;
     }
 
-    public AddressDataSet getAddress() {
-        return address;
+    public List<ChatMessageDataSet> getMessages() {
+        return messages;
     }
 
-    public void setAddress(AddressDataSet address) {
-        this.address = address;
-    }
-
-    public List<PhoneDataSet> getPhones() {
-        return phones;
-    }
-
-    public void addPhone(PhoneDataSet phone) {
-        this.phones.add(phone);
-        phone.setOwner(this);
+    public void addPhone(ChatMessageDataSet message) {
+        this.messages.add(message);
+        message.setAuthor(this);
     }
 }

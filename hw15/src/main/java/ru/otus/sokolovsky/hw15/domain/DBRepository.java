@@ -1,8 +1,10 @@
 package ru.otus.sokolovsky.hw15.domain;
 
+import ru.otus.l151.messageSystem.Addressee;
+
 import java.util.List;
 
-public interface DBService<E extends DataSet> {
+public interface DBRepository<E extends DataSet> {
 
     void save(E dataSet);
 

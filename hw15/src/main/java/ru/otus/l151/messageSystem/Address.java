@@ -10,11 +10,11 @@ public final class Address {
     private final String id;
 
     public Address(){
-        id = String.valueOf(ID_GENERATOR.getAndIncrement());
+        this("");
     }
 
-    public Address(String id) {
-        this.id = id;
+    public Address(String group) {
+        this.id = group + "-" + String.valueOf(ID_GENERATOR.getAndIncrement());
     }
 
     @Override
@@ -34,5 +34,10 @@ public final class Address {
 
     public String getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return getId();
     }
 }

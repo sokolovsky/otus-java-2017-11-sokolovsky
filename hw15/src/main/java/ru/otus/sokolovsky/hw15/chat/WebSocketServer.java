@@ -39,7 +39,7 @@ public class WebSocketServer extends org.java_websocket.server.WebSocketServer {
         Map<String, Object> mParcel = Parcel.createMap(s);
         // получить json
         // отправить сервису бд через систему сообщений в отдельном потоке
-        // для тестирования интерфейса
+        // для тестирования интерфейса оповещения тут не должно быть
         this.broadcast(
                 "{\"sender\": \""+login+"\", \"message\": \"" + mParcel.get("message") + "\", \"time\": \"10: 21\"}"
         );

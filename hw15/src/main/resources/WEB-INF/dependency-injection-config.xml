@@ -28,7 +28,7 @@
         <constructor-arg name="dropSqlFiles" value="${dropTableFiles}"/>
         <constructor-arg name="executor" ref="sqlExecutor"/>
     </bean>
-    <bean id="userDbService" class="ru.otus.sokolovsky.hw15.myormintegration.UserDBServiceImpl" >
+    <bean id="userDbService" class="ru.otus.sokolovsky.hw15.db.UserDBRepositoryImpl" >
         <constructor-arg name="connection" ref="dbConnection" />
     </bean>
 </beans>

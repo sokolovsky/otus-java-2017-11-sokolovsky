@@ -2,8 +2,8 @@ package ru.otus.sokolovsky.hw15.servlet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
-import ru.otus.sokolovsky.hw15.domain.UserDBService;
-import ru.otus.sokolovsky.hw15.domain.UserDataSet;
+import ru.otus.sokolovsky.hw15.domain.UserDBRepository;
+import ru.otus.sokolovsky.hw15.db.UserDataSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class DbUsersViewServlet extends RenderedServlet {
 
     @Autowired
-    private UserDBService userDBService;
+    private UserDBRepository userDBService;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
