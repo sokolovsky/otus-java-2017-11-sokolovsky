@@ -16,17 +16,12 @@ import java.util.stream.Collectors;
 @Configurable
 public class ChatInitServlet extends RenderedServlet {
 
-    @Autowired
-    private UserDBService userDBService;
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Utils.responseOk(resp);
-        List<UserDataSet> userDataSets = userDBService.readAll();
+        String login = (String) req.getSession().getAttribute("login");
         render(resp.getWriter(), new HashMap<String, Object>() {{
-            Map<Long, String> map = userDataSets.stream().collect(Collectors.toMap(UserDataSet::getId, UserDataSet::getName));
-            put("list", map);
-            put("title", "Users");
+            put("login", login);
         }});
     }
 }

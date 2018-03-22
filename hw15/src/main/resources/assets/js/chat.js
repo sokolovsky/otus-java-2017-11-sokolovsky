@@ -1,4 +1,5 @@
 $(() => {
+    const data = $("#frame").data();
 
     function newMessage() {
         const message = $(".message-input input").val();
@@ -22,4 +23,15 @@ $(() => {
             return false;
         }
     });
+
+    const socket = new WebSocket("ws://localhost:10001/chat-" + data.login);
+
+    socket.onopen = function(event) {
+        console.log('Connection is set up');
+        console.log(arguments);
+    };
+
+    socket.onmessage = function (event) {
+        console.log(event);
+    };
 });
