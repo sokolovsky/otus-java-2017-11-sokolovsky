@@ -1,8 +1,23 @@
 $(() => {
     const data = $("#frame").data();
+    const login = data.login;
 
-    function newMessage() {
-        const message = $(".message-input input").val();
+    const socket = new WebSocket("ws://localhost:10001/chat-" + login);
+
+    socket.onopen = function(event) {
+        console.log('Connection is set up');
+        console.log(arguments);
+    };
+
+    socket.onmessage = function (event) {
+        console.log(event);
+        if (event.data.sender === login) {
+            return;
+        }
+        newMessage(event.data.message);
+    };
+
+    function newMessage(message) {
         if($.trim(message) === '') {
             return false;
         }
@@ -13,25 +28,26 @@ $(() => {
         $(".messages").animate({ scrollTop: $(document).height() }, "fast");
     }
 
+    function getInputMessage() {
+        return $(".message-input input").val();
+    }
+
+    function send() {
+        const message = getInputMessage();
+        newMessage(message);
+        socket.send('{"message": "' + message + '"}');
+        socket.send('a simple string');
+        console.log("sent", '{"message": "' + message + '"}');
+    }
+
     $('.submit').click(function() {
-        newMessage();
+        send();
     });
 
     $(window).on('keydown', function(e) {
         if (e.which === 13) {
-            newMessage();
+            send();
             return false;
         }
     });
-
-    const socket = new WebSocket("ws://localhost:10001/chat-" + data.login);
-
-    socket.onopen = function(event) {
-        console.log('Connection is set up');
-        console.log(arguments);
-    };
-
-    socket.onmessage = function (event) {
-        console.log(event);
-    };
 });
