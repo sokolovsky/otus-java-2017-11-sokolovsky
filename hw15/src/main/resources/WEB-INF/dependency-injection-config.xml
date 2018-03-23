@@ -10,7 +10,6 @@
     <bean id="renderer" class="ru.otus.sokolovsky.hw15.renderer.Renderer">
         <constructor-arg name="layout" value="templates/layout.ftl"/>
     </bean>
-    <bean id="accounts" class="ru.otus.sokolovsky.hw15.inmemory.Accounts"/>
     <bean id="usersProvider" class="ru.otus.sokolovsky.hw15.provider.UsersProvider">
         <constructor-arg name="str" value="${users}"/>
     </bean>

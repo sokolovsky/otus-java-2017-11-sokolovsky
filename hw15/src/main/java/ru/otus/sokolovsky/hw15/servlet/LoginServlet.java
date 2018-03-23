@@ -1,6 +1,6 @@
 package ru.otus.sokolovsky.hw15.servlet;
 
-import ru.otus.sokolovsky.hw15.inmemory.Accounts;
+import ru.otus.sokolovsky.hw15.domain.UserDBRepository;
 
 import org.springframework.beans.factory.annotation.*;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +16,7 @@ public class LoginServlet extends RenderedServlet {
     private static final String PASSWORD_PARAM = "pass";
 
     @Autowired
-    private Accounts accounts;
+    private UserDBRepository accounts;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -41,8 +41,6 @@ public class LoginServlet extends RenderedServlet {
             resp.sendRedirect("/");
             return;
         }
-
-        System.out.println(accounts.getData().size());
 
         render(resp.getWriter(), new HashMap<String, Object>() {{
             put("error", "User with sent data doesn't exist");

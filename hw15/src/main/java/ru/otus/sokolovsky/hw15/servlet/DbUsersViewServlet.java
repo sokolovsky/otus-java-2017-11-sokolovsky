@@ -24,7 +24,7 @@ public class DbUsersViewServlet extends RenderedServlet {
         Utils.responseOk(resp);
         List<UserDataSet> userDataSets = userDBService.readAll();
         render(resp.getWriter(), new HashMap<String, Object>() {{
-            Map<Long, String> map = userDataSets.stream().collect(Collectors.toMap(UserDataSet::getId, UserDataSet::getName));
+            Map<Long, String> map = userDataSets.stream().collect(Collectors.toMap(UserDataSet::getId, UserDataSet::getLogin));
             put("list", map);
             put("title", "Users");
         }});

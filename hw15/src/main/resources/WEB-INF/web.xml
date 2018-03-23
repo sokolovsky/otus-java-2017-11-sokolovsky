@@ -58,9 +58,6 @@
         <listener-class>ru.otus.sokolovsky.hw15.listener.CreateDbTables</listener-class>
     </listener>
     <listener>
-        <listener-class>ru.otus.sokolovsky.hw15.listener.InitAccounts</listener-class>
-    </listener>
-    <listener>
         <listener-class>ru.otus.sokolovsky.hw15.listener.InitDbUsers</listener-class>
     </listener>
     <listener>

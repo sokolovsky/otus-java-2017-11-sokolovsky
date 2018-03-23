@@ -3,8 +3,6 @@ package ru.otus.sokolovsky.hw15.db;
 import ru.otus.sokolovsky.hw15.domain.DataSet;
 
 import javax.persistence.*;
-import java.util.LinkedList;
-import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -15,13 +13,13 @@ public class UserDataSet extends DataSet {
     private long id;
 
     @Column
-    private String name;
+    private String login;
+
+    @Column
+    private String password;
 
     @Column
     private int age;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private List<ChatMessageDataSet> messages = new LinkedList<>();
 
     public long getId() {
         return id;
@@ -31,12 +29,12 @@ public class UserDataSet extends DataSet {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getLogin() {
+        return login;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLogin(String name) {
+        this.login = name;
     }
 
     public int getAge() {
@@ -47,12 +45,11 @@ public class UserDataSet extends DataSet {
         this.age = age;
     }
 
-    public List<ChatMessageDataSet> getMessages() {
-        return messages;
+    public String getPassword() {
+        return password;
     }
 
-    public void addPhone(ChatMessageDataSet message) {
-        this.messages.add(message);
-        message.setAuthor(this);
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
