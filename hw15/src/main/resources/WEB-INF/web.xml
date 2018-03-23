@@ -64,7 +64,7 @@
         <listener-class>ru.otus.sokolovsky.hw15.listener.InitDbUsers</listener-class>
     </listener>
     <listener>
-        <listener-class>ru.otus.sokolovsky.hw15.listener.InitWebSockets</listener-class>
+        <listener-class>ru.otus.sokolovsky.hw15.listener.InitFrontend</listener-class>
     </listener>
     <context-param>
         <param-name>contextConfigLocation</param-name>

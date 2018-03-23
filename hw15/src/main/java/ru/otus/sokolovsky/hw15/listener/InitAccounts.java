@@ -25,8 +25,6 @@ public class InitAccounts implements ServletContextListener {
     }
 
     private void initAccounts() {
-        usersProvider.getRecords().forEach((k, v) -> {
-            accounts.add(k, v);
-        });
+        usersProvider.getRecords().forEach((k, v) -> accounts.add(k, v));
     }
 }
