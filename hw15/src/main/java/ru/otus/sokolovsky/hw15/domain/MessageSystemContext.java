@@ -28,8 +28,8 @@ public class MessageSystemContext {
         messageSystem.addAddressee(addressee);
     }
 
-    public void getAddress(AddressType type) {
-        addresses.get(type);
+    public Address getAddress(AddressType type) {
+        return addresses.get(type);
     }
 
     public void send(Message message) {

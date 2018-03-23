@@ -34,6 +34,10 @@
         <constructor-arg name="connection" ref="dbConnection"/>
     </bean>
 
+    <bean id="chatDbRepository" class="ru.otus.sokolovsky.hw15.db.ChatDBRepositoryImpl">
+        <constructor-arg name="connection" ref="dbConnection"/>
+    </bean>
+
     <bean id="messageSystemContext" class="ru.otus.sokolovsky.hw15.domain.MessageSystemContext">
         <constructor-arg name="messageSystem" ref="messageSystem"/>
         <constructor-arg name="addressees">
@@ -50,10 +54,15 @@
 
     <bean id="messageSystem" class="ru.otus.l151.messageSystem.MessageSystem"/>
 
-    <bean id="dbService" class="ru.otus.sokolovsky.hw15.db.DBService"/>
+    <bean id="dbService" class="ru.otus.sokolovsky.hw15.db.DBService">
+        <constructor-arg name="userDBRepo" ref="userDbRepository"/>
+        <constructor-arg name="chatDBRepo" ref="chatDbRepository"/>
+        <property name="messageSystemContext" ref="messageSystemContext"/>
+    </bean>
 
     <bean id="frontendService" class="ru.otus.sokolovsky.hw15.chat.ChatServiceImpl">
         <constructor-arg name="chatServer" ref="chatServer"/>
+        <property name="messageSystemContext" ref="messageSystemContext"/>
     </bean>
 
     <bean id="chatServer" class="ru.otus.sokolovsky.hw15.chat.WebSocketChatServerImpl">

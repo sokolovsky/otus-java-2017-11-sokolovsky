@@ -3,6 +3,7 @@ package ru.otus.sokolovsky.hw15.db;
 import ru.otus.sokolovsky.hw15.domain.DataSet;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -13,7 +14,7 @@ public class ChatMessageDataSet extends DataSet {
     private long authorId;
 
     @Column
-    private Date time;
+    private LocalDateTime time;
 
     @Column
     private String text;
@@ -26,11 +27,11 @@ public class ChatMessageDataSet extends DataSet {
         this.authorId = author.getId();
     }
 
-    public Date getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 

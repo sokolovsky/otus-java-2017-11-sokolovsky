@@ -1,42 +1,44 @@
 package ru.otus.sokolovsky.hw15.db;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import ru.otus.l151.messageSystem.Address;
 import ru.otus.l151.messageSystem.Addressee;
+import ru.otus.sokolovsky.hw15.chat.BroadcastMessage;
 import ru.otus.sokolovsky.hw15.domain.ChatDBRepository;
+import ru.otus.sokolovsky.hw15.domain.MessageSystemContext;
 import ru.otus.sokolovsky.hw15.domain.UserDBRepository;
 
-import java.util.Date;
 import java.util.List;
 
-@Component
-public class DBService implements Addressee {
+public class DBService implements ru.otus.sokolovsky.hw15.domain.DBService, Addressee {
 
     private Address address = new Address("DB");
 
-    @Autowired
     private UserDBRepository userDBRepo;
 
-    @Autowired
     private ChatDBRepository chatDBRepo;
+
+    private MessageSystemContext msContext;
 
     @Override
     public Address getAddress() {
         return address;
     }
 
-    public void recieveMessage(String login, Date time, String text) {
-        List<UserDataSet> userDataSets = userDBRepo.readByLogin(login);
-        if (userDataSets.size() == 0) {
-            throw new RuntimeException(String.format("User with login %s isn't exists", login));
-        }
+    public DBService(UserDBRepository userDBRepo, ChatDBRepository chatDBRepo) {
 
-        ChatMessageDataSet messageDataSet = new ChatMessageDataSet();
-        messageDataSet.setAuthor(userDataSets.get(0));
-        messageDataSet.setTime(time);
-        messageDataSet.setText(text);
+        this.userDBRepo = userDBRepo;
+        this.chatDBRepo = chatDBRepo;
+    }
 
+    public void setMessageSystemContext(MessageSystemContext msContext) {
+        this.msContext = msContext;
+    }
+
+    @Override
+    public void saveMessage(String author, ChatMessageDataSet messageDataSet, Address initializer) {
+        List<UserDataSet> users = userDBRepo.readByLogin(author);
+        messageDataSet.setAuthor(users.get(0));
         chatDBRepo.save(messageDataSet);
+        msContext.send(new BroadcastMessage(getAddress(), initializer, messageDataSet));
     }
 }
