@@ -1,6 +1,5 @@
 package ru.otus.sokolovsky.hw15.db;
 
-import ru.otus.l151.messageSystem.Address;
 import ru.otus.sokolovsky.hw15.domain.DBRepository;
 import ru.otus.sokolovsky.hw15.domain.DataSet;
 import ru.otus.sokolovsky.hw15.myorm.DataSetDao;

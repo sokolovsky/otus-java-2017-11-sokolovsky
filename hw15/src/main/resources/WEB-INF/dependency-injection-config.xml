@@ -8,27 +8,56 @@
     </bean>
 
     <bean id="renderer" class="ru.otus.sokolovsky.hw15.renderer.Renderer">
-        <constructor-arg name="layout" value="templates/layout.ftl" />
+        <constructor-arg name="layout" value="templates/layout.ftl"/>
     </bean>
     <bean id="accounts" class="ru.otus.sokolovsky.hw15.inmemory.Accounts"/>
     <bean id="usersProvider" class="ru.otus.sokolovsky.hw15.provider.UsersProvider">
-        <constructor-arg name="str" value="${users}" />
+        <constructor-arg name="str" value="${users}"/>
     </bean>
     <bean id="dbConnection" class="ru.otus.sokolovsky.hw15.myorm.ConnectionBuilder" factory-method="build">
-        <constructor-arg name="connStr" value="${jdbc.connection}" />
-        <constructor-arg name="driverDefinition" value="${jdbc.driver}" />
-        <constructor-arg name="user" value="${jdbc.user}" />
-        <constructor-arg name="pass" value="${jdbc.pass}" />
+        <constructor-arg name="connStr" value="${jdbc.connection}"/>
+        <constructor-arg name="driverDefinition" value="${jdbc.driver}"/>
+        <constructor-arg name="user" value="${jdbc.user}"/>
+        <constructor-arg name="pass" value="${jdbc.pass}"/>
     </bean>
     <bean id="sqlExecutor" class="ru.otus.sokolovsky.hw15.myorm.SqlExecutor">
-        <constructor-arg name="connection" ref="dbConnection" />
+        <constructor-arg name="connection" ref="dbConnection"/>
     </bean>
     <bean id="databaseBuilder" class="ru.otus.sokolovsky.hw15.provider.DatabaseBuilder">
         <constructor-arg name="createSqlFiles" value="${createTableFiles}"/>
         <constructor-arg name="dropSqlFiles" value="${dropTableFiles}"/>
         <constructor-arg name="executor" ref="sqlExecutor"/>
     </bean>
-    <bean id="userDbService" class="ru.otus.sokolovsky.hw15.db.UserDBRepositoryImpl" >
-        <constructor-arg name="connection" ref="dbConnection" />
+
+    <!--messages dependencies-->
+
+    <bean id="userDbRepository" class="ru.otus.sokolovsky.hw15.db.UserDBRepositoryImpl">
+        <constructor-arg name="connection" ref="dbConnection"/>
+    </bean>
+
+    <bean id="messageSystemContext" class="ru.otus.sokolovsky.hw15.domain.MessageSystemContext">
+        <constructor-arg name="messageSystem" ref="messageSystem"/>
+        <constructor-arg name="addressees">
+            <map>
+                <entry value-ref="dbService">
+                    <key><value type="ru.otus.sokolovsky.hw15.domain.MessageSystemContext$AddressType">DB</value></key>
+                </entry>
+                <entry value-ref="frontendService">
+                    <key><value type="ru.otus.sokolovsky.hw15.domain.MessageSystemContext$AddressType">FRONT</value></key>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="messageSystem" class="ru.otus.l151.messageSystem.MessageSystem"/>
+
+    <bean id="dbService" class="ru.otus.sokolovsky.hw15.db.DBService"/>
+
+    <bean id="frontendService" class="ru.otus.sokolovsky.hw15.chat.ChatServiceImpl">
+        <constructor-arg name="chatServer" ref="chatServer"/>
+    </bean>
+
+    <bean id="chatServer" class="ru.otus.sokolovsky.hw15.chat.WebSocketChatServerImpl">
+        <constructor-arg name="port" value="${websocket.server.port}"/>
     </bean>
 </beans>
