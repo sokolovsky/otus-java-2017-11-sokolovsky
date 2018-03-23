@@ -18,6 +18,6 @@ public class MsgGetUserId extends MsgToDB {
     @Override
     public void exec(DBService dbService) {
         int id = dbService.getUserId(login);
-        dbService.getMS().sendMessage(new MsgGetUserIdAnswer(getTo(), getFrom(), login, id));
+//        dbService.getMS().sendMessage(new MsgGetUserIdAnswer(getTo(), getFrom(), login, id));
     }
 }

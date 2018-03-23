@@ -41,6 +41,7 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
 
         String json = injectLoginToJsonMessage(loginOptional.get(), s);
         messageHandlers.forEach(h -> h.accept(json));
+        System.out.println("Message send to accept.");
     }
 
     private String injectLoginToJsonMessage(String login, String json) {
@@ -54,7 +55,7 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
 
     @Override
     public void onStart() {
-        System.out.println("WebSocket server is started");
+        System.out.printf("\n\nWebSocket server is started. Port: %d\n\n", getPort());
     }
 
     @Override
@@ -72,6 +73,6 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
         if (!matcher.find()) {
             return Optional.empty();
         }
-        return Optional.of(matcher.replaceAll(str));
+        return Optional.of(matcher.replaceAll(""));
     }
 }

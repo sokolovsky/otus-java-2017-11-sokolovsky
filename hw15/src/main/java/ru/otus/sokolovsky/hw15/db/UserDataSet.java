@@ -8,10 +8,6 @@ import javax.persistence.*;
 @Table(name = "user")
 public class UserDataSet extends DataSet {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
     @Column
     private String login;
 
@@ -20,14 +16,6 @@ public class UserDataSet extends DataSet {
 
     @Column
     private int age;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getLogin() {
         return login;

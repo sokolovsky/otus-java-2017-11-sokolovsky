@@ -4,6 +4,8 @@ import ru.otus.sokolovsky.hw15.domain.DBRepository;
 import ru.otus.sokolovsky.hw15.domain.DataSet;
 import ru.otus.sokolovsky.hw15.myorm.DataSetDao;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -52,6 +54,7 @@ public abstract class AbstractDBRepository<E extends DataSet> implements DBRepos
 
     @SuppressWarnings("unchecked")
     private Class<E> getGenericClass() {
-        return (Class<E>) getClass().getGenericSuperclass();
+        ParameterizedType parametrizedType = (ParameterizedType) getClass().getGenericSuperclass();
+        return (Class<E>) parametrizedType.getActualTypeArguments()[0];
     }
 }

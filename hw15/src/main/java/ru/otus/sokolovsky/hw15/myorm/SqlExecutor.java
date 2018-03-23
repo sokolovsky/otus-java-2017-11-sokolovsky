@@ -46,6 +46,8 @@ public class SqlExecutor {
         List<String> columns = new ArrayList<>(filter.keySet());
         sql = String.format(sql, collectSqlSet(columns));
         List<ValueContainer> values = columns.stream().map(filter::get).collect(Collectors.toList());
+        System.out.println(sql);
+        System.out.println(values);
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             setPreparedValues(statement, values);
             statement.executeQuery();
@@ -120,6 +122,6 @@ public class SqlExecutor {
     private String collectSqlSet(List<String> columns) {
         List<String> set = new LinkedList<>();
         columns.forEach((key) -> set.add(key + "= ?" ));
-        return String.join(", ", set);
+        return String.join(" && ", set);
     }
 }

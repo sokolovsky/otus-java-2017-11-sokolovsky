@@ -13,7 +13,7 @@ import java.util.Objects;
 public class LoginServlet extends RenderedServlet {
 
     private static final String LOGIN_PARAM = "login";
-    private static final String PASSWORD_PARAM = "pass";
+    private static final String PASSWORD_PARAM = "password";
 
     @Autowired
     private UserDBRepository accounts;

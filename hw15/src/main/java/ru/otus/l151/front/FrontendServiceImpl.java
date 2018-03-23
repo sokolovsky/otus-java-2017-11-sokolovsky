@@ -43,8 +43,4 @@ public class FrontendServiceImpl implements FrontendService {
         System.out.println("User: " + name + " has id: " + id);
     }
 
-    @Override
-    public MessageSystem getMS() {
-        return context.getMessageSystem();
-    }
 }

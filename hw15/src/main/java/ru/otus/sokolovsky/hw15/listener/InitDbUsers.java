@@ -49,10 +49,10 @@ public class InitDbUsers implements ServletContextListener {
     private void createUsers() {
         String hash = Utils.generateHash(PASSWORD);
         String[] sqlStrings = {
-                String.format("INSERT INTO user SET name=\"ivan\", age=18, password=\"%s\"", hash),
-                String.format("INSERT INTO user SET name=\"user\", age=19, password=\"%s\"", hash),
-                String.format("INSERT INTO user SET name=\"guest\", age=20, password=\"%s\"", hash),
-                String.format("INSERT INTO user SET name=\"admin\", age=20, password=\"%s\"", hash),
+                String.format("INSERT INTO user SET login=\"ivan\", age=18, password=\"%s\"", hash),
+                String.format("INSERT INTO user SET login=\"user\", age=19, password=\"%s\"", hash),
+                String.format("INSERT INTO user SET login=\"guest\", age=20, password=\"%s\"", hash),
+                String.format("INSERT INTO user SET login=\"admin\", age=20, password=\"%s\"", hash),
         };
         Arrays.stream(sqlStrings).forEach(sql -> {
             try {
