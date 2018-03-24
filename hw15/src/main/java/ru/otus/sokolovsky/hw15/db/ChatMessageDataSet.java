@@ -18,6 +18,11 @@ public class ChatMessageDataSet extends DataSet {
 
     @Column
     private String text;
+    private UserDataSet author;
+
+    public UserDataSet getAuthor() {
+        return author;
+    }
 
     public long getAuthorId() {
         return authorId;
@@ -25,6 +30,7 @@ public class ChatMessageDataSet extends DataSet {
 
     public void setAuthor(UserDataSet author) {
         this.authorId = author.getId();
+        this.author = author;
     }
 
     public LocalDateTime getTime() {

@@ -25,6 +25,10 @@ public class DBServiceImpl implements DBService {
         return address;
     }
 
+    @Override
+    public void setMessageSystemContext(ru.otus.sokolovsky.hw15.domain.MessageSystemContext msContext) {
+    }
+
     public int getUserId(String name) {
         //todo: load id from ru.otus.sokolovsky.hw15.db
         return name.hashCode();

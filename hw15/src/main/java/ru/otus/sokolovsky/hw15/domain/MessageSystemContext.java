@@ -21,11 +21,13 @@ public class MessageSystemContext {
     public MessageSystemContext(MessageSystem messageSystem, Map<AddressType, Addressee> addressees) {
         this.messageSystem = messageSystem;
         addressees.forEach(this::addAddressee);
+        messageSystem.start();
     }
 
     public void addAddressee(AddressType type, Addressee addressee) {
         addresses.put(type, addressee.getAddress());
         messageSystem.addAddressee(addressee);
+        addressee.setMessageSystemContext(this);
     }
 
     public Address getAddress(AddressType type) {

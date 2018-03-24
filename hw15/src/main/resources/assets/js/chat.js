@@ -10,22 +10,29 @@ $(() => {
     };
 
     socket.onmessage = function (event) {
-        console.log(event);
-        if (event.data.sender === login) {
-            return;
-        }
-        newMessage(event.data.message);
+        let data = $.parseJSON(event.data);
+        newMessage(data, data.login === login);
     };
 
-    function newMessage(message) {
-        if($.trim(message) === '') {
+    function newMessage(data, self) {
+        if($.trim(data) === '') {
             return false;
         }
-        // class="replies" // for reverse of message
-        $('<li class="sent"><img src="/assets/img/face.png" alt="" /><p>' + message + '</p></li>').appendTo($('.messages ul'));
+
+        const messageContainer = $(
+                '<li class="sent"><img src="/assets/img/face.png" alt="" /><p>' +
+                data.login + '<br/>' + data.time + '<br/>' + data.message +
+                '</p></li>'
+            )
+            .appendTo($('.messages ul'));
+
         $('.message-input input').val(null);
-        $('.contact.active .preview').html('<span>You: </span>' + message);
+        $('.contact.active .preview').html('<span>You: </span>' + data.message);
         $(".messages").animate({ scrollTop: $(document).height() }, "fast");
+
+        if (!self) {
+            messageContainer.removeClass("sent").addClass("replies");
+        }
     }
 
     function getInputMessage() {
@@ -34,9 +41,7 @@ $(() => {
 
     function send() {
         const message = getInputMessage();
-        newMessage(message);
         socket.send('{"message": "' + message + '"}');
-        socket.send('a simple string');
         console.log("sent", '{"message": "' + message + '"}');
     }
 

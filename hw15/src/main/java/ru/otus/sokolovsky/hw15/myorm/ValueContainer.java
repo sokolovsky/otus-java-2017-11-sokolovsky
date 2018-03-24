@@ -2,7 +2,7 @@ package ru.otus.sokolovsky.hw15.myorm;
 
 public class ValueContainer {
     enum Type {
-        INT, LONG, FLOAT, DOUBLE, STRING, BOOL
+        INT, LONG, FLOAT, DOUBLE, STRING, BOOL, DATE_TIME
     }
 
     private Type type;

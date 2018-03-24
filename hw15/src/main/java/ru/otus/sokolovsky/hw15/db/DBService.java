@@ -1,5 +1,6 @@
 package ru.otus.sokolovsky.hw15.db;
 
+import org.springframework.context.annotation.Lazy;
 import ru.otus.l151.messageSystem.Address;
 import ru.otus.l151.messageSystem.Addressee;
 import ru.otus.sokolovsky.hw15.chat.BroadcastMessage;
@@ -30,6 +31,7 @@ public class DBService implements ru.otus.sokolovsky.hw15.domain.DBService, Addr
         this.chatDBRepo = chatDBRepo;
     }
 
+    @Override
     public void setMessageSystemContext(MessageSystemContext msContext) {
         this.msContext = msContext;
     }

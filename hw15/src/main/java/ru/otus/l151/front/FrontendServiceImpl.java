@@ -33,6 +33,10 @@ public class FrontendServiceImpl implements FrontendService {
         return address;
     }
 
+    @Override
+    public void setMessageSystemContext(ru.otus.sokolovsky.hw15.domain.MessageSystemContext msContext) {
+    }
+
     public void handleRequest(String login) {
         Message message = new MsgGetUserId(getAddress(), context.getDbAddress(), login);
         context.getMessageSystem().sendMessage(message);

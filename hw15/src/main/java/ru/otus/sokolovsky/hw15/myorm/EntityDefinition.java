@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,12 @@ public class EntityDefinition<T> {
         while (iClass != Object.class) {
             for (Field field : iClass.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Column.class)) {
-                    columns.put(field.getName(), field);
+                    String name = field.getName();
+                    Column annotation = field.getAnnotation(Column.class);
+                    if (!annotation.name().equals("")) {
+                        name = annotation.name();
+                    }
+                    columns.put(name, field);
                 }
                 if (field.isAnnotationPresent(Id.class)) {
                     columns.put(field.getName(), field);
@@ -52,6 +58,9 @@ public class EntityDefinition<T> {
         }
         if (valueClass == String.class) {
             container = new ValueContainer(ValueContainer.Type.STRING, value);
+        }
+        if (valueClass == LocalDateTime.class) {
+            container = new ValueContainer(ValueContainer.Type.DATE_TIME, value);
         }
         return Objects.requireNonNull(container);
     }

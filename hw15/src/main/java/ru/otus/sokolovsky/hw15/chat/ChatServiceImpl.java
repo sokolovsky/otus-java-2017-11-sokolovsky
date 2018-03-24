@@ -2,6 +2,7 @@ package ru.otus.sokolovsky.hw15.chat;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.springframework.context.annotation.Lazy;
 import ru.otus.l151.messageSystem.Address;
 import ru.otus.sokolovsky.hw15.db.ChatMessageDataSet;
 import ru.otus.sokolovsky.hw15.db.HandleChatMessage;
@@ -24,6 +25,7 @@ public class ChatServiceImpl implements ChatService {
         chatServer.registerMessageHandler(this::handleRequest);
     }
 
+    @Override
     public void setMessageSystemContext(MessageSystemContext msContext) {
         this.msContext = msContext;
     }
@@ -44,11 +46,14 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void pushMessage(ChatMessageDataSet message) {
-        // приобразовать сообщение из json
         Gson gson = new GsonBuilder().create();
-        // подобрать карту и спарсить с нее
-        Map<String, String> map = new HashMap<>();
-        chatServer.sendAll(gson.toJson(map));
+        Map<String, String> map = new HashMap<String, String>() {{
+            put("login", message.getAuthor().getLogin());
+            put("time", message.getTime().toString());
+            put("message", message.getText());
+        }};
+        System.out.println("Response: " + gson.toJson(new HashMap<>(map)));
+        chatServer.sendAll(gson.toJson(new HashMap<>(map)));
     }
 
     @Override

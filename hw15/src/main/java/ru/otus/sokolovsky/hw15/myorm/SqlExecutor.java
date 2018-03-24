@@ -1,6 +1,7 @@
 package ru.otus.sokolovsky.hw15.myorm;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,10 +45,8 @@ public class SqlExecutor {
 
     public void execSelect(String sql, Map<String, ValueContainer> filter, RecordSetHandler handler) throws SQLException {
         List<String> columns = new ArrayList<>(filter.keySet());
-        sql = String.format(sql, collectSqlSet(columns));
+        sql = String.format(sql, collectSqlSet(columns, " && "));
         List<ValueContainer> values = columns.stream().map(filter::get).collect(Collectors.toList());
-        System.out.println(sql);
-        System.out.println(values);
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             setPreparedValues(statement, values);
             statement.executeQuery();
@@ -67,7 +66,7 @@ public class SqlExecutor {
         String sql = "UPDATE `%s` SET %s where id = ?";
 
         List<String> columns = new ArrayList<>(map.keySet());
-        sql = String.format(sql, table, collectSqlSet(columns));
+        sql = String.format(sql, table, collectSqlSet(columns, ", "));
         List<ValueContainer> values = columns.stream().map(map::get).collect(Collectors.toList());
         values.add(new ValueContainer(ValueContainer.Type.LONG, id));
 
@@ -82,7 +81,7 @@ public class SqlExecutor {
     long insert(String table, Map<String, ValueContainer> map) {
         String sql = "INSERT INTO %s SET %s";
         List<String> columns = new LinkedList<>(map.keySet());
-        sql = String.format(sql, table, collectSqlSet(columns));
+        sql = String.format(sql, table, collectSqlSet(columns, ","));
         List<ValueContainer> values = columns.stream().map(map::get).collect(Collectors.toList());
 
         try {
@@ -115,13 +114,15 @@ public class SqlExecutor {
                     break;
                 case STRING:
                     statement.setString(i, (String) container.getValue());
+                case DATE_TIME:
+                    statement.setObject(i, container.getValue());
             }
         }
     }
 
-    private String collectSqlSet(List<String> columns) {
+    private String collectSqlSet(List<String> columns, String delimiter) {
         List<String> set = new LinkedList<>();
         columns.forEach((key) -> set.add(key + "= ?" ));
-        return String.join(" && ", set);
+        return String.join(delimiter, set);
     }
 }

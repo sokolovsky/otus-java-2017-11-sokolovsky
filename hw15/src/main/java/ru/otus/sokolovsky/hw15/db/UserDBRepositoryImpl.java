@@ -16,7 +16,7 @@ public class UserDBRepositoryImpl extends AbstractDBRepository<UserDataSet> impl
     @Override
     public List<UserDataSet> readByLogin(String login) {
         Map<String, Object> filter = new HashMap<>();
-        filter.put("name", login);
+        filter.put("login", login);
         return getDao().loadByFilter(filter, UserDataSet.class);
     }
 

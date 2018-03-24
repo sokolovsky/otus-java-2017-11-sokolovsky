@@ -57,12 +57,10 @@
     <bean id="dbService" class="ru.otus.sokolovsky.hw15.db.DBService">
         <constructor-arg name="userDBRepo" ref="userDbRepository"/>
         <constructor-arg name="chatDBRepo" ref="chatDbRepository"/>
-        <property name="messageSystemContext" ref="messageSystemContext"/>
     </bean>
 
     <bean id="frontendService" class="ru.otus.sokolovsky.hw15.chat.ChatServiceImpl">
         <constructor-arg name="chatServer" ref="chatServer"/>
-        <property name="messageSystemContext" ref="messageSystemContext"/>
     </bean>
 
     <bean id="chatServer" class="ru.otus.sokolovsky.hw15.chat.WebSocketChatServerImpl">
