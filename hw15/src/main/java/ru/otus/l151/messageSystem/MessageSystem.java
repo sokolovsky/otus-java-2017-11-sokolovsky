@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  */
 public final class MessageSystem {
     private final static Logger logger = Logger.getLogger(MessageSystem.class.getName());
-    private static final int DEFAULT_STEP_TIME = 10;
+    private static final int DEFAULT_CYCLE_TIME = 10; // ms
 
     private final List<Thread> workers;
     private final Map<Address, ConcurrentLinkedQueue<Message>> messagesMap;
@@ -40,14 +40,15 @@ public final class MessageSystem {
             String name = "MS-worker-" + entry.getKey().getId();
             Thread thread = new Thread(() -> {
                 while (true) {
-
+                    long atStartTime = System.currentTimeMillis();
                     ConcurrentLinkedQueue<Message> queue = messagesMap.get(entry.getKey());
                     while (!queue.isEmpty()) {
                         Message message = queue.poll();
                         message.exec(entry.getValue());
                     }
+                    long inTheEndTime = System.currentTimeMillis();
                     try {
-                        Thread.sleep(MessageSystem.DEFAULT_STEP_TIME);
+                        Thread.sleep(MessageSystem.DEFAULT_CYCLE_TIME - (inTheEndTime - atStartTime));
                     } catch (InterruptedException e) {
                         logger.log(Level.INFO, "Thread interrupted. Finishing: " + name);
                         return;
