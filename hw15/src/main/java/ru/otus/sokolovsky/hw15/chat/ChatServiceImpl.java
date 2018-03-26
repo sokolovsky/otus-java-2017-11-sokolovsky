@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import org.springframework.context.annotation.Lazy;
 import ru.otus.l151.messageSystem.Address;
 import ru.otus.sokolovsky.hw15.db.ChatMessageDataSet;
+import ru.otus.sokolovsky.hw15.db.GetLastMessagesMessage;
 import ru.otus.sokolovsky.hw15.db.HandleChatMessage;
 import ru.otus.sokolovsky.hw15.domain.ChatService;
 import ru.otus.sokolovsky.hw15.domain.MessageSystemContext;
@@ -23,6 +24,13 @@ public class ChatServiceImpl implements ChatService {
     public ChatServiceImpl(ChatServer chatServer) {
         this.chatServer = chatServer;
         chatServer.registerMessageHandler(this::handleRequest);
+        chatServer.registerConnectionHandler(this::handleNewConnection);
+    }
+
+    private void handleNewConnection(String login) {
+        System.out.println("To handle connection with: " + login);
+        Address dbAddress = msContext.getAddress(MessageSystemContext.AddressType.DB);
+        msContext.send(new GetLastMessagesMessage(getAddress(), dbAddress, login));
     }
 
     @Override
@@ -44,16 +52,25 @@ public class ChatServiceImpl implements ChatService {
         msContext.send(new HandleChatMessage(getAddress(), dbAddress, login, chatMessage));
     }
 
-    @Override
-    public void pushMessage(ChatMessageDataSet message) {
+    private String messageToJson(ChatMessageDataSet message) {
         Gson gson = new GsonBuilder().create();
         Map<String, String> map = new HashMap<String, String>() {{
             put("login", message.getAuthor().getLogin());
             put("time", message.getTime().toString());
             put("message", message.getText());
         }};
-        System.out.println("Response: " + gson.toJson(new HashMap<>(map)));
-        chatServer.sendAll(gson.toJson(new HashMap<>(map)));
+        // Gson has one bug with serialize of maps
+        return gson.toJson(new HashMap<>(map));
+    }
+
+    @Override
+    public void pushMessage(ChatMessageDataSet message) {
+        chatServer.sendAll(messageToJson(message));
+    }
+
+    @Override
+    public void pushMessage(ChatMessageDataSet message, String destination) {
+        chatServer.send(messageToJson(message), destination);
     }
 
     @Override

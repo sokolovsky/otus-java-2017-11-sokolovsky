@@ -12,5 +12,7 @@ public interface DBRepository<E extends DataSet> {
 
     List<E> readAll();
 
+    List<E> readLast(int limit);
+
     void shutdown();
 }

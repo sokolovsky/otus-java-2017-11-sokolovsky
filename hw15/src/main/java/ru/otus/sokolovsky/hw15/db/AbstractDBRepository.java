@@ -44,6 +44,11 @@ public abstract class AbstractDBRepository<E extends DataSet> implements DBRepos
     }
 
     @Override
+    public List<E> readLast(int limit) {
+        return dao.loadLatest(limit, getGenericClass());
+    }
+
+    @Override
     public void shutdown() {
         try {
             connection.close();

@@ -2,11 +2,13 @@ package ru.otus.sokolovsky.hw15.myorm;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class DataSetDao<T> {
@@ -23,19 +25,35 @@ public class DataSetDao<T> {
         return loadByFilter(filter, cl).get(0);
     }
 
-    @SuppressWarnings("unchecked")
-    public List<T> loadByFilter(Map<String, Object> values, Class<T> cl) {
-        EntityDefinition<T> definition = EntityDefinitionsRegister.getDefinition(cl);
-        Supplier<T> createEmptyModel = () -> {
-            T model;
+    private T newModel(Class<T> tClass) {
+        T model;
+        try {
+            model = (T) tClass.getDeclaredConstructors()[0].newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return model;
+    }
+
+    private RecordSetHandler hidrate(EntityDefinition<T> definition, List<T> aggregator) {
+        Class<T> cl = definition.getDefinedClass();
+        return (ResultSet resultSet) -> {
             try {
-                model = (T) cl.getDeclaredConstructors()[0].newInstance();
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                T model = newModel(cl);
+                definition.fillOne(model, resultSet);
+                aggregator.add(model);
+            } catch (SQLException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
-            return model;
         };
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<T> loadByFilter(Map<String, Object> values, Class<T> cl) {
+        EntityDefinition<T> definition = EntityDefinitionsRegister.getDefinition(cl);
 
         String sql = "SELECT * from %s";
         Map<String, ValueContainer> filter = new HashMap<>();
@@ -43,21 +61,32 @@ public class DataSetDao<T> {
         List<T> result = new LinkedList<>();
 
         try {
-            executor.execSelect(String.format(sql, definition.tableName()) +  " where %s", filter, (resultSet -> {
-                try {
-                    int columnCount = resultSet.getMetaData().getColumnCount();
-                    Map<String, String> pairs = new HashMap<>();
-                    for (int i = 1; i <= columnCount; i++) {
-                        pairs.put(resultSet.getMetaData().getColumnName(i), resultSet.getString(i));
-                    }
-                    T model = createEmptyModel.get();
-                    definition.fillOne(model, pairs);
-                    result.add(model);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                }
-            }));
+            executor.execSelect(
+                    String.format(sql, definition.tableName()) + " where %s",
+                    filter,
+                    this.hidrate(definition, result)
+            );
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<T> loadLatest(int limit, Class<T> cl) {
+        EntityDefinition<T> definition = EntityDefinitionsRegister.getDefinition(cl);
+
+        String sql = "SELECT * from %s order by id desc limit %d";
+        Map<String, ValueContainer> filter = new HashMap<>();
+        List<T> result = new LinkedList<>();
+
+        try {
+            executor.execSelect(
+                    String.format(sql, definition.tableName(), limit),
+                    filter,
+                    this.hidrate(definition, result)
+            );
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

@@ -7,4 +7,6 @@ public interface ChatService extends Addressee {
     void handleRequest(String request);
 
     void pushMessage(ChatMessageDataSet message);
+
+    void pushMessage(ChatMessageDataSet message, String user);
 }

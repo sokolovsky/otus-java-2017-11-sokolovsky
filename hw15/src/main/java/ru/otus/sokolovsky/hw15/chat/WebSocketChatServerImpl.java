@@ -4,9 +4,7 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +13,8 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
     private static Pattern channelTestPattern = Pattern.compile("^/chat-");
 
     private List<Consumer<String>> messageHandlers = new ArrayList<>();
+    private List<Consumer<String>> connectHandlers = new ArrayList<>();
+    private Map<String, WebSocket> activeSockets = new HashMap<>();
 
     public WebSocketChatServerImpl(int port) {
         super(new InetSocketAddress(port));
@@ -23,18 +23,31 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         System.out.println("Connect: " + clientHandshake.getResourceDescriptor());
+
+        Optional<String> loginOptional = parseLogin(webSocket);
+        if (!loginOptional.isPresent()) {
+            return;
+        }
+        activeSockets.put(loginOptional.get(), webSocket);
+        connectHandlers.forEach(h -> h.accept(loginOptional.get()));
+        System.out.println("Connection handlers  send to accept.");
     }
 
     @Override
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
         System.out.println("WebSocket server is closed");
+        Optional<String> loginOptional = parseLogin(webSocket);
+        if (!loginOptional.isPresent()) {
+            return;
+        }
+
+        activeSockets.remove(loginOptional.get());
     }
 
     @Override
     public void onMessage(WebSocket webSocket, String s) {
         System.out.println("Message received: " + s);
-        String resource = webSocket.getResourceDescriptor();
-        Optional<String> loginOptional = parseLogin(resource);
+        Optional<String> loginOptional = parseLogin(webSocket);
         if (!loginOptional.isPresent()) {
             return;
         }
@@ -64,8 +77,24 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
     }
 
     @Override
+    public void registerConnectionHandler(Consumer<String> handler) {
+        connectHandlers.add(handler);
+    }
+
+    @Override
     public void sendAll(String message) {
         this.broadcast(message);
+    }
+
+    @Override
+    public void send(String message, String destination) {
+        System.out.printf("send %s to %s\n", message, destination);
+        WebSocket webSocket = activeSockets.get(destination);
+        if (webSocket == null) {
+            System.out.println("But socket is null");
+            return;
+        }
+        webSocket.send(message);
     }
 
     private Optional<String> parseLogin(String str) {
@@ -74,5 +103,10 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
             return Optional.empty();
         }
         return Optional.of(matcher.replaceAll(""));
+    }
+
+    private Optional<String> parseLogin(WebSocket webSocket) {
+        String resource = webSocket.getResourceDescriptor();
+        return parseLogin(resource);
     }
 }

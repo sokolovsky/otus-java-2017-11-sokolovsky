@@ -47,8 +47,12 @@ public final class MessageSystem {
                         message.exec(entry.getValue());
                     }
                     long inTheEndTime = System.currentTimeMillis();
+                    long sleepTime = MessageSystem.DEFAULT_CYCLE_TIME - (inTheEndTime - atStartTime);
+                    if (sleepTime <= 0) {
+                        continue;
+                    }
                     try {
-                        Thread.sleep(MessageSystem.DEFAULT_CYCLE_TIME - (inTheEndTime - atStartTime));
+                        Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
                         logger.log(Level.INFO, "Thread interrupted. Finishing: " + name);
                         return;

@@ -4,7 +4,14 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Time;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -12,8 +19,10 @@ public class EntityDefinition<T> {
     private final String tableName;
     private Map<String, Field> columns = new HashMap<>();
     private Set<Field> primaries = new HashSet<>();
+    private Class<T> cls;
 
     public EntityDefinition(Class<T> cls) {
+        this.cls = cls;
         Table entityAnnotation = Objects.requireNonNull(cls.getAnnotation(Table.class));
 
         tableName = entityAnnotation.name();
@@ -85,33 +94,41 @@ public class EntityDefinition<T> {
         return res;
     }
 
-    public void fillOne(T model, Map<String, String> pairs) {
-        for (Map.Entry<String, String> entry : pairs.entrySet()) {
-            if (!columns.containsKey(entry.getKey())) {
+    public void fillOne(T model, ResultSet resultSet) throws SQLException {
+        int columnCount = resultSet.getMetaData().getColumnCount();
+
+        for (int i = 1; i <= columnCount; i++) {
+            String columnName = resultSet.getMetaData().getColumnName(i);
+            if (!columns.containsKey(columnName)) {
                 continue;
             }
 
-            Field field = columns.get(entry.getKey());
+            Field field = columns.get(columnName);
             field.setAccessible(true);
 
             Object value = null;
-            String strValue = entry.getValue();
             Class<?> fieldType = field.getType();
 
             if (fieldType == Long.class || fieldType == long.class) {
-                value = Long.parseLong(strValue);
+                value = resultSet.getLong(i);
             }
             if (fieldType == Integer.class || fieldType == int.class) {
-                value = Integer.parseInt(strValue);
+                value = resultSet.getInt(i);
             }
             if (fieldType == Double.class || fieldType == double.class) {
-                value = Double.parseDouble(strValue);
+                value = resultSet.getDouble(i);
             }
             if (fieldType == Float.class || fieldType == float.class) {
-                value = Float.parseFloat(strValue);
+                value = resultSet.getFloat(i);
             }
             if (fieldType == String.class) {
-                value = strValue;
+                value = resultSet.getString(i);
+            }
+            if (fieldType == LocalDateTime.class) {
+                LocalDate date = resultSet.getDate(i).toLocalDate();
+                Time time = resultSet.getTime(i);
+                LocalTime localTime = LocalTime.of(time.getHours(), time.getMinutes(), time.getSeconds());
+                value = LocalDateTime.of(date, localTime);
             }
             if (value == null) {
                 continue;
@@ -158,5 +175,9 @@ public class EntityDefinition<T> {
 
     public String tableName() {
         return tableName;
+    }
+
+    public Class<T> getDefinedClass() {
+        return cls;
     }
 }
