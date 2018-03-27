@@ -14,15 +14,25 @@ $(() => {
         newMessage(data, data.login === login);
     };
 
+    function addZeros(n, needLength) {
+        needLength = needLength || 2;
+        n = String(n);
+        while (n.length < needLength) {
+            n = "0" + n;
+        }
+        return n
+    }
+
     function newMessage(data, self) {
         if($.trim(data) === '') {
             return false;
         }
+        const time = new Date(data.time);
 
         const messageContainer = $(
-                '<li class="sent"><img src="/assets/img/face.png" alt="" /><p>' +
-                data.login + '<br/>' + data.time + '<br/>' + data.message +
-                '</p></li>'
+                '<li class="sent"><img src="/assets/img/face.png" alt="" /><p><b>' + data.login + '</b><br/>' +
+                addZeros(time.getHours(), 2)+ ':' + addZeros(time.getMinutes(), 2) + '<br/><br /><i>' +
+                data.message + '</i></p></li>'
             )
             .appendTo($('.messages ul'));
 
