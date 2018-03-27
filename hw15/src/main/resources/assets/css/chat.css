@@ -14,9 +14,7 @@ ol, ul, li {
 
 #frame {
     height: 92vh;
-    min-height: 300px;
     max-height: 720px;
-    background: #E6EAEA;
 }
 @media screen and (max-width: 360px) {
     #frame {
@@ -28,7 +26,7 @@ ol, ul, li {
 #frame .content {
     float: right;
     width: 100%;
-    height: 100%;
+    height: 90%;
     overflow: hidden;
     position: relative;
 }
@@ -73,7 +71,7 @@ ol, ul, li {
 }
 #frame .content .messages {
     height: auto;
-    min-height: calc(100% - 93px);
+    min-height: calc(100% - 193px);
     max-height: calc(100% - 50px);
     overflow-y: scroll;
     overflow-x: hidden;
