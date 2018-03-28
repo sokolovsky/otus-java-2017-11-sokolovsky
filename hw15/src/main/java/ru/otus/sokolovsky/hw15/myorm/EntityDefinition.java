@@ -10,8 +10,6 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,7 +19,7 @@ public class EntityDefinition<T> {
     private Set<Field> primaries = new HashSet<>();
     private Class<T> cls;
 
-    public EntityDefinition(Class<T> cls) {
+    EntityDefinition(Class<T> cls) {
         this.cls = cls;
         Table entityAnnotation = Objects.requireNonNull(cls.getAnnotation(Table.class));
 
@@ -80,7 +78,7 @@ public class EntityDefinition<T> {
             Field field = entry.getValue();
             field.setAccessible(true);
 
-            ValueContainer container = null;
+            ValueContainer container;
             try {
                 container = createContainerByValue(field.get(model));
             } catch (IllegalAccessException e) {
@@ -94,6 +92,7 @@ public class EntityDefinition<T> {
         return res;
     }
 
+    @SuppressWarnings("unchecked")
     public void fillOne(T model, ResultSet resultSet) throws SQLException {
         int columnCount = resultSet.getMetaData().getColumnCount();
 
@@ -142,7 +141,11 @@ public class EntityDefinition<T> {
     }
 
     public long getPkValue(Object model) {
-        Field field = primaries.stream().findFirst().get();
+        Optional<Field> optionalField = primaries.stream().findFirst();
+        if (!optionalField.isPresent()) {
+            throw new RuntimeException("Model doesn't have pk");
+        }
+        Field field = optionalField.get();
         field.setAccessible(true);
         try {
             return (long) field.get(model);
@@ -152,7 +155,11 @@ public class EntityDefinition<T> {
     }
 
     public void setPkValue(Object model, long pk) {
-        Field field = primaries.stream().findFirst().get();
+        Optional<Field> optionalField = primaries.stream().findFirst();
+        if (!optionalField.isPresent()) {
+            throw new RuntimeException("Model doesn't have pk");
+        }
+        Field field = optionalField.get();
         field.setAccessible(true);
         try {
             field.set(model, pk);
