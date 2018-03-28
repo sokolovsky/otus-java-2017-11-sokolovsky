@@ -4,9 +4,9 @@ import ru.otus.l151.messageSystem.Address;
 import ru.otus.l151.messageSystem.Addressee;
 import ru.otus.l151.messageSystem.MessageSystemContext;
 import ru.otus.sokolovsky.hw15.chat.BroadcastMessage;
-import ru.otus.sokolovsky.hw15.chat.UserBulkMessage;
 import ru.otus.sokolovsky.hw15.domain.ChatDBRepository;
 import ru.otus.sokolovsky.hw15.domain.ChatMessage;
+import ru.otus.sokolovsky.hw15.domain.ServiceMessageFactory;
 import ru.otus.sokolovsky.hw15.domain.UserDBRepository;
 
 import java.util.List;
@@ -17,6 +17,7 @@ public class DBServiceImpl  implements ru.otus.sokolovsky.hw15.domain.DBService,
 
     private Address address = new Address("DB");
 
+    private ServiceMessageFactory serviceMessageFactory;
     private UserDBRepository userDBRepo;
 
     private ChatDBRepository chatDBRepo;
@@ -28,8 +29,8 @@ public class DBServiceImpl  implements ru.otus.sokolovsky.hw15.domain.DBService,
         return address;
     }
 
-    public DBServiceImpl(UserDBRepository userDBRepo, ChatDBRepository chatDBRepo) {
-
+    public DBServiceImpl(ServiceMessageFactory serviceMessageFactory, UserDBRepository userDBRepo, ChatDBRepository chatDBRepo) {
+        this.serviceMessageFactory = serviceMessageFactory;
         this.userDBRepo = userDBRepo;
         this.chatDBRepo = chatDBRepo;
     }
@@ -45,7 +46,7 @@ public class DBServiceImpl  implements ru.otus.sokolovsky.hw15.domain.DBService,
         ChatMessageDataSet chatMessageDataSet = (ChatMessageDataSet) message;
         chatMessageDataSet.setAuthor(users.get(0));
         chatDBRepo.save(chatMessageDataSet);
-        msContext.send(new BroadcastMessage(getAddress(), initializer, message));
+        msContext.send(serviceMessageFactory.createBroadcastMessage(getAddress(), initializer, message));
     }
 
     @Override
@@ -61,6 +62,6 @@ public class DBServiceImpl  implements ru.otus.sokolovsky.hw15.domain.DBService,
                 .stream()
                 .map(ChatMessage.class::cast)
                 .collect(Collectors.toList());
-        msContext.send(new UserBulkMessage(getAddress(), initializer, user, list));
+        msContext.send(serviceMessageFactory.createSenderOfUserBulkMessages(getAddress(), initializer, user, list));
     }
 }

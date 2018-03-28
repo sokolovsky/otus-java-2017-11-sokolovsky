@@ -4,11 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ru.otus.l151.messageSystem.Address;
 import ru.otus.l151.messageSystem.MessageSystemContext;
-import ru.otus.sokolovsky.hw15.db.GetLastMessagesMessage;
-import ru.otus.sokolovsky.hw15.db.RecieveChatMessage;
 import ru.otus.sokolovsky.hw15.domain.AddressTypes;
 import ru.otus.sokolovsky.hw15.domain.ChatMessage;
 import ru.otus.sokolovsky.hw15.domain.ChatService;
+import ru.otus.sokolovsky.hw15.domain.ServiceMessageFactory;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -17,14 +16,16 @@ import java.util.Map;
 public abstract class ChatServiceImpl implements ChatService {
 
     private ChatServer chatServer;
+    private ServiceMessageFactory serviceMessageFactory;
 
     private Address address = new Address("frontend");
     private MessageSystemContext msContext;
 
     protected abstract ChatMessage createChatMessage();
 
-    public ChatServiceImpl(ChatServer chatServer) {
+    public ChatServiceImpl(ChatServer chatServer, ServiceMessageFactory serviceMessageFactory) {
         this.chatServer = chatServer;
+        this.serviceMessageFactory = serviceMessageFactory;
         chatServer.registerMessageHandler(this::handleRequest);
         chatServer.registerConnectionHandler(this::handleNewConnection);
     }
@@ -32,7 +33,7 @@ public abstract class ChatServiceImpl implements ChatService {
     private void handleNewConnection(String login) {
         System.out.println("To handle connection with: " + login);
         Address dbAddress = msContext.getAddress(AddressTypes.DB.getName());
-        msContext.send(new GetLastMessagesMessage(getAddress(), dbAddress, login));
+        msContext.send(serviceMessageFactory.createGetLastMessagesMessage(getAddress(), dbAddress, login));
     }
 
     @Override
@@ -51,7 +52,7 @@ public abstract class ChatServiceImpl implements ChatService {
         ChatMessage chatMessage = createChatMessage();
         chatMessage.setText((String) map.get("message"));
         chatMessage.setTime(LocalDateTime.now());
-        msContext.send(new RecieveChatMessage(getAddress(), dbAddress, login, chatMessage));
+        msContext.send(serviceMessageFactory.createReceiveChatMessage(getAddress(), dbAddress, login, chatMessage));
     }
 
     private String messageToJson(ChatMessage message) {

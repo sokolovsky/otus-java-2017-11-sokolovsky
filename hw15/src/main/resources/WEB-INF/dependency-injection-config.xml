@@ -55,15 +55,19 @@
 
     <bean id="messageSystem" class="ru.otus.l151.messageSystem.MessageSystem"/>
 
-    <bean name="chatMessage" class="ru.otus.sokolovsky.hw15.db.ChatMessageDataSet" scope="prototype" />
+    <bean name="chatMessage" class="ru.otus.sokolovsky.hw15.db.ChatMessageDataSet" scope="prototype" lazy-init="true"/>
+
+    <bean name="serviceMessageFactory" class="ru.otus.sokolovsky.hw15.domain.ServiceMessageFactoryImpl"/>
 
     <bean id="dbService" class="ru.otus.sokolovsky.hw15.db.DBServiceImpl">
         <constructor-arg name="userDBRepo" ref="userDbRepository"/>
         <constructor-arg name="chatDBRepo" ref="chatDbRepository"/>
+        <constructor-arg name="serviceMessageFactory" ref="serviceMessageFactory" />
     </bean>
 
     <bean id="frontendService" class="ru.otus.sokolovsky.hw15.chat.ChatServiceImpl">
         <constructor-arg name="chatServer" ref="chatServer"/>
+        <constructor-arg name="serviceMessageFactory" ref="serviceMessageFactory" />
         <lookup-method name="createChatMessage" bean="chatMessage" />
     </bean>
 
