@@ -38,29 +38,33 @@
         <constructor-arg name="connection" ref="dbConnection"/>
     </bean>
 
-    <bean id="messageSystemContext" class="ru.otus.sokolovsky.hw15.domain.MessageSystemContext">
+    <bean id="messageSystemContext" class="ru.otus.sokolovsky.hw15.domain.MessageSystemContextImpl">
         <constructor-arg name="messageSystem" ref="messageSystem"/>
         <constructor-arg name="addressees">
             <map>
                 <entry value-ref="dbService">
-                    <key><value type="ru.otus.sokolovsky.hw15.domain.MessageSystemContext$AddressType">DB</value></key>
+                    <key><value>DB</value></key>
                 </entry>
                 <entry value-ref="frontendService">
-                    <key><value type="ru.otus.sokolovsky.hw15.domain.MessageSystemContext$AddressType">FRONT</value></key>
+                    <key><value>FRONT</value></key>
                 </entry>
             </map>
         </constructor-arg>
+        <constructor-arg name="dbService" ref="dbService"/>
     </bean>
 
     <bean id="messageSystem" class="ru.otus.l151.messageSystem.MessageSystem"/>
 
-    <bean id="dbService" class="ru.otus.sokolovsky.hw15.db.DBService">
+    <bean name="chatMessage" class="ru.otus.sokolovsky.hw15.db.ChatMessageDataSet" scope="prototype" />
+
+    <bean id="dbService" class="ru.otus.sokolovsky.hw15.db.DBServiceImpl">
         <constructor-arg name="userDBRepo" ref="userDbRepository"/>
         <constructor-arg name="chatDBRepo" ref="chatDbRepository"/>
     </bean>
 
     <bean id="frontendService" class="ru.otus.sokolovsky.hw15.chat.ChatServiceImpl">
         <constructor-arg name="chatServer" ref="chatServer"/>
+        <lookup-method name="createChatMessage" bean="chatMessage" />
     </bean>
 
     <bean id="chatServer" class="ru.otus.sokolovsky.hw15.chat.WebSocketChatServerImpl">

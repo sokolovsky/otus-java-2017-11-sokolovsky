@@ -2,24 +2,26 @@ package ru.otus.sokolovsky.hw15.chat;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.springframework.context.annotation.Lazy;
 import ru.otus.l151.messageSystem.Address;
-import ru.otus.sokolovsky.hw15.db.ChatMessageDataSet;
+import ru.otus.l151.messageSystem.MessageSystemContext;
 import ru.otus.sokolovsky.hw15.db.GetLastMessagesMessage;
-import ru.otus.sokolovsky.hw15.db.HandleChatMessage;
+import ru.otus.sokolovsky.hw15.db.RecieveChatMessage;
+import ru.otus.sokolovsky.hw15.domain.AddressTypes;
+import ru.otus.sokolovsky.hw15.domain.ChatMessage;
 import ru.otus.sokolovsky.hw15.domain.ChatService;
-import ru.otus.sokolovsky.hw15.domain.MessageSystemContext;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChatServiceImpl implements ChatService {
+public abstract class ChatServiceImpl implements ChatService {
 
     private ChatServer chatServer;
 
     private Address address = new Address("frontend");
     private MessageSystemContext msContext;
+
+    protected abstract ChatMessage createChatMessage();
 
     public ChatServiceImpl(ChatServer chatServer) {
         this.chatServer = chatServer;
@@ -29,7 +31,7 @@ public class ChatServiceImpl implements ChatService {
 
     private void handleNewConnection(String login) {
         System.out.println("To handle connection with: " + login);
-        Address dbAddress = msContext.getAddress(MessageSystemContext.AddressType.DB);
+        Address dbAddress = msContext.getAddress(AddressTypes.DB.getName());
         msContext.send(new GetLastMessagesMessage(getAddress(), dbAddress, login));
     }
 
@@ -44,18 +46,18 @@ public class ChatServiceImpl implements ChatService {
         System.out.println("To handle request: " + json);
         Gson gson = new GsonBuilder().create();
         Map<String, Object> map = gson.fromJson(json, Map.class);
-        Address dbAddress = msContext.getAddress(MessageSystemContext.AddressType.DB);
+        Address dbAddress = msContext.getAddress(AddressTypes.DB.getName());
         String login = (String) map.get("login");
-        ChatMessageDataSet chatMessage = new ChatMessageDataSet();
+        ChatMessage chatMessage = createChatMessage();
         chatMessage.setText((String) map.get("message"));
         chatMessage.setTime(LocalDateTime.now());
-        msContext.send(new HandleChatMessage(getAddress(), dbAddress, login, chatMessage));
+        msContext.send(new RecieveChatMessage(getAddress(), dbAddress, login, chatMessage));
     }
 
-    private String messageToJson(ChatMessageDataSet message) {
+    private String messageToJson(ChatMessage message) {
         Gson gson = new GsonBuilder().create();
         Map<String, String> map = new HashMap<String, String>() {{
-            put("login", message.getAuthor().getLogin());
+            put("login", message.getAuthor());
             put("time", message.getTime().toString());
             put("message", message.getText());
         }};
@@ -64,12 +66,12 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public void pushMessage(ChatMessageDataSet message) {
+    public void pushMessage(ChatMessage message) {
         chatServer.sendAll(messageToJson(message));
     }
 
     @Override
-    public void pushMessage(ChatMessageDataSet message, String destination) {
+    public void pushMessage(ChatMessage message, String destination) {
         chatServer.send(messageToJson(message), destination);
     }
 

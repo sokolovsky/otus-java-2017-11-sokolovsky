@@ -1,7 +1,5 @@
 package ru.otus.l151.messageSystem;
 
-import ru.otus.sokolovsky.hw15.domain.MessageSystemContext;
-
 /**
  * @author tully
  */

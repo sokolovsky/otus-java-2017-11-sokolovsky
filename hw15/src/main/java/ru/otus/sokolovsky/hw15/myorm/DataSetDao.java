@@ -4,10 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -91,6 +88,7 @@ public class DataSetDao<T> {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+        Collections.reverse(result);
         return result;
     }
 

@@ -1,14 +1,14 @@
 package ru.otus.sokolovsky.hw15.db;
 
+import ru.otus.sokolovsky.hw15.domain.ChatMessage;
 import ru.otus.sokolovsky.hw15.domain.DataSet;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "messages")
-public class ChatMessageDataSet extends DataSet {
+public class ChatMessageDataSet extends DataSet implements ChatMessage {
 
     @Column(name = "author_id")
     private long authorId;
@@ -18,9 +18,11 @@ public class ChatMessageDataSet extends DataSet {
 
     @Column
     private String text;
-    private UserDataSet author;
 
-    public UserDataSet getAuthor() {
+    private String author;
+
+    @Override
+    public String getAuthor() {
         return author;
     }
 
@@ -30,9 +32,14 @@ public class ChatMessageDataSet extends DataSet {
 
     public void setAuthor(UserDataSet author) {
         this.authorId = author.getId();
+        this.author = author.getLogin();
+    }
+
+    public void setAuthor(String author) {
         this.author = author;
     }
 
+    @Override
     public LocalDateTime getTime() {
         return time;
     }
@@ -41,6 +48,7 @@ public class ChatMessageDataSet extends DataSet {
         this.time = time;
     }
 
+    @Override
     public String getText() {
         return text;
     }

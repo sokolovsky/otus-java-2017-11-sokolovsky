@@ -1,39 +1,36 @@
 package ru.otus.sokolovsky.hw15.domain;
 
-import ru.otus.l151.messageSystem.Address;
-import ru.otus.l151.messageSystem.Addressee;
-import ru.otus.l151.messageSystem.Message;
-import ru.otus.l151.messageSystem.MessageSystem;
+import ru.otus.l151.messageSystem.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MessageSystemContext {
+public class MessageSystemContextImpl implements MessageSystemContext {
 
     private final MessageSystem messageSystem;
+    private final DBService dbService;
 
-    public enum AddressType {
-        DB, FRONT
-    }
+    private Map<String, Address> addresses = new HashMap<>();
 
-    Map<AddressType, Address> addresses = new HashMap<>();
-
-    public MessageSystemContext(MessageSystem messageSystem, Map<AddressType, Addressee> addressees) {
+    public MessageSystemContextImpl(MessageSystem messageSystem, Map<String, Addressee> addressees, DBService dbService) {
         this.messageSystem = messageSystem;
+        this.dbService = dbService;
         addressees.forEach(this::addAddressee);
         messageSystem.start();
     }
 
-    public void addAddressee(AddressType type, Addressee addressee) {
+    private void addAddressee(String type, Addressee addressee) {
         addresses.put(type, addressee.getAddress());
         messageSystem.addAddressee(addressee);
         addressee.setMessageSystemContext(this);
     }
 
-    public Address getAddress(AddressType type) {
+    @Override
+    public Address getAddress(String type) {
         return addresses.get(type);
     }
 
+    @Override
     public void send(Message message) {
         messageSystem.sendMessage(message);
     }

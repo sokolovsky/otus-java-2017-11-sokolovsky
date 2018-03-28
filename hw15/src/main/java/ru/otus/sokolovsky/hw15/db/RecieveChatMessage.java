@@ -3,14 +3,15 @@ package ru.otus.sokolovsky.hw15.db;
 import ru.otus.l151.messageSystem.Address;
 import ru.otus.l151.messageSystem.Addressee;
 import ru.otus.l151.messageSystem.Message;
+import ru.otus.sokolovsky.hw15.domain.ChatMessage;
 import ru.otus.sokolovsky.hw15.domain.DBService;
 
-public class HandleChatMessage extends Message {
+public class RecieveChatMessage extends Message {
 
     private final String login;
-    private final ChatMessageDataSet chatMessage;
+    private final ChatMessage chatMessage;
 
-    public HandleChatMessage(Address from, Address to, String login, ChatMessageDataSet chatMessage) {
+    public RecieveChatMessage(Address from, Address to, String login, ChatMessage chatMessage) {
         super(from, to);
         this.login = login;
         this.chatMessage = chatMessage;
