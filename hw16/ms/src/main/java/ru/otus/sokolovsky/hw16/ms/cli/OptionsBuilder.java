@@ -5,31 +5,20 @@ import org.apache.commons.cli.Options;
 
 public class OptionsBuilder {
 
-    public static final String OPTION_CONTROL_PORT = "controlPort";
-    public static final String OPTION_EXCHANGE_PORT = "exchangePort";
+    public static final String OPTION_CONTROL_PORT = "port";
 
     public static Options build() {
         Options options = new Options();
-        options.addOption(buildControlPortOption());
-        options.addOption(buildExchangePortOption());
+        options.addOption(buildPortOption());
         return options;
     }
 
-    private static Option buildControlPortOption() {
-        return Option.builder("cport")
+    private static Option buildPortOption() {
+        return Option.builder("port")
                 .longOpt(OPTION_CONTROL_PORT)
                 .desc("Used for control connection. Value from 1024 to 65536")
                 .valueSeparator()
                 .hasArg(true)
-                .build();
-    }
-
-    private static Option buildExchangePortOption() {
-        return Option.builder("eport")
-                .longOpt(OPTION_EXCHANGE_PORT)
-                .valueSeparator()
-                .hasArg(true)
-                .desc("Used for common exchange connection. Value from 1024 to 65536")
                 .build();
     }
 }
