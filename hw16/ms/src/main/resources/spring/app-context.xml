@@ -1,0 +1,20 @@
+<!--suppress SpringFacetInspection -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations" value="project.properties"/>
+    </bean>
+
+    <bean id="serverListener" class="ru.otus.sokolovsky.hw16.ms.server.ServerListenerImpl">
+        <property name="connectionHandlers" ref="connectionHandlers"/>
+    </bean>
+
+    <bean id="connectionPoolHandler" class="ru.otus.sokolovsky.hw16.ms.manage.ConnectionsPoolHandler"/>
+
+    <util:list id="connectionHandlers">
+        <ref bean="connectionPoolHandler"/>
+    </util:list>
+</beans>
