@@ -1,4 +1,9 @@
 package ru.otus.sokolovsky.hw16.ms.message;
 
-public class EventMessage implements Message {
+import java.util.Map;
+
+public interface EventMessage extends Message {
+    String name();
+
+    Map<String, String> getParams();
 }

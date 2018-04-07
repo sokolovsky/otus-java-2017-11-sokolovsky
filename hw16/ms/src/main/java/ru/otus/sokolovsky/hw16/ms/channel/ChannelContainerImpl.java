@@ -9,12 +9,12 @@ public class ChannelContainerImpl implements ChannelContainer {
 
     @Override
 
-    public void addNamedChannel(ChannelImpl channel) {
+    public void addNamedChannel(Channel channel) {
         namedChannels.put(channel.getName(), channel);
     }
 
     @Override
-    public void addPrivateChannel(ChannelImpl channel, Object owner) {
+    public void addPrivateChannel(Channel channel, Object owner) {
         privateChannels.put(owner, channel);
     }
 

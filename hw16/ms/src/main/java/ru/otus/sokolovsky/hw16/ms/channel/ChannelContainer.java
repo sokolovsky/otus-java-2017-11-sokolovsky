@@ -1,9 +1,9 @@
 package ru.otus.sokolovsky.hw16.ms.channel;
 
 public interface ChannelContainer {
-    void addNamedChannel(ChannelImpl channel);
+    void addNamedChannel(Channel channel);
 
-    void addPrivateChannel(ChannelImpl channel, Object owner);
+    void addPrivateChannel(Channel channel, Object owner);
 
     Channel getPrivateChannel(Object owner);
 

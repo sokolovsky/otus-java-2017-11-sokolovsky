@@ -4,11 +4,11 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.otus.sokolovsky.hw16.ms.cli.OptionsBuilder;
-import ru.otus.sokolovsky.hw16.ms.controller.ControllerListener;
-import ru.otus.sokolovsky.hw16.ms.controller.ExchangeListener;
-
-import java.io.IOException;
+import ru.otus.sokolovsky.hw16.ms.manage.SystemManager;
+import ru.otus.sokolovsky.hw16.ms.server.ServerListener;
 
 public class App {
     public static void main(String[] args) {
@@ -21,24 +21,20 @@ public class App {
             return;
         }
 
-        String exchangePortArg = cli.getOptionValue(OptionsBuilder.OPTION_EXCHANGE_PORT, null);
-        String controlPortArg = cli.getOptionValue(OptionsBuilder.OPTION_CONTROL_PORT, null);
+        String sPort = cli.getOptionValue(OptionsBuilder.OPTION_CONTROL_PORT, null);
+        int port = Integer.parseInt(sPort);
 
-        if (exchangePortArg == null || controlPortArg == null) {
-            printHelp();
-            return;
-        }
+        ApplicationContext ctx = getAppContext();
 
-        int exchangePort = Integer.parseInt(exchangePortArg);
-        int controlPort = Integer.parseInt(controlPortArg);
+        SystemManager systemManager = (SystemManager) ctx.getBean("systemManager");
+        systemManager.initService();
 
-        try {
-            new ControllerListener(controlPort).start();
-            new ExchangeListener(exchangePort).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
+        ServerListener listener = (ServerListener) ctx.getBean("serverListener");
+        listener.startListening(port);
+    }
+
+    private static ApplicationContext getAppContext() {
+        return new ClassPathXmlApplicationContext("META-INF/spring/app-context.xml");
     }
 
     private static void printHelp() {

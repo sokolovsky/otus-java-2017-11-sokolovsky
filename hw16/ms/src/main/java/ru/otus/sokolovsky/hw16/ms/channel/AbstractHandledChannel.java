@@ -2,17 +2,15 @@ package ru.otus.sokolovsky.hw16.ms.channel;
 
 import ru.otus.sokolovsky.hw16.ms.message.Message;
 
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class ChannelImpl implements Channel {
+public abstract class AbstractHandledChannel implements HandledChannel {
     private Queue<Message> queue = new LinkedBlockingQueue<>();
     private Set<Message> polled = new HashSet<>();
     private String name;
 
-    public ChannelImpl(String name) {
+    public AbstractHandledChannel(String name) {
         this.name = name;
     }
 
@@ -22,6 +20,7 @@ public class ChannelImpl implements Channel {
 
     public void addMessage(Message message) {
         queue.add(message);
+        notifyHandlers(message);
     }
 
     public boolean hasMessages() {
@@ -41,4 +40,6 @@ public class ChannelImpl implements Channel {
     public int confirmWaited() {
         return polled.size();
     }
+
+    protected abstract void notifyHandlers(Message message);
 }

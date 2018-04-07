@@ -1,4 +1,11 @@
 package ru.otus.sokolovsky.hw16.ms.message;
 
-public class CommandMessage implements Message {
+import java.util.Map;
+
+public interface CommandMessage extends Message {
+    String getCommand();
+
+    Map<String, String> getArgs();
+
+    Message createAnswer();
 }
