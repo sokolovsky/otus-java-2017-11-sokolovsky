@@ -1,25 +1,56 @@
 package ru.otus.sokolovsky.hw16.ms.manage;
 
-import ru.otus.sokolovsky.hw16.ms.channel.ChannelFactory;
+import ru.otus.sokolovsky.hw16.ms.channel.Channel;
+import ru.otus.sokolovsky.hw16.ms.channel.PointToPointChannel;
+import ru.otus.sokolovsky.hw16.ms.client.Connector;
 import ru.otus.sokolovsky.hw16.ms.server.ConnectionHandler;
 
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ConnectionsPoolHandler implements ConnectionHandler {
 
-    private ChannelFactory channelFactory;
+    private final ExecutorService threadPool;
+    private SystemManager msManager;
 
-    public ConnectionsPoolHandler(ChannelFactory channelFactory) {
-        this.channelFactory = channelFactory;
+    private static int connectionsIndex = 0;
+
+    private Map<String, PointToPointChannel> connectionChannels = new HashMap<>();
+    private Map<String, Connector> connectors = new HashMap<>();
+
+    public ConnectionsPoolHandler(SystemManager systemManager) {
+        msManager = systemManager;
+        threadPool = Executors.newCachedThreadPool();
     }
 
     @Override
     public void handle(Socket socket) {
-        // use private channel
+        PointToPointChannel channel = msManager.createPointToPointChannel(getNewChannelName());
+        connectionChannels.put(channel.getName(), channel);
+        Connector connector = new Connector(socket, channel, msManager::routeMessage);
+        connectors.put(channel.getName(), connector);
+        threadPool.submit(connector);
+    }
+
+    public Channel getChannel(String name) {
+        return connectionChannels.get(name);
+    }
+
+    private String getNewChannelName() {
+        return String.format("Channel-%d", connectionsIndex++);
     }
 
     @Override
     public void close() {
-        // need to close socket connection
+        connectors.forEach((n, connector) -> {
+            try {
+                connector.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

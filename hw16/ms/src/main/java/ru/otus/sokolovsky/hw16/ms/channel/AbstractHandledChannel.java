@@ -5,7 +5,7 @@ import ru.otus.sokolovsky.hw16.ms.message.Message;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class AbstractHandledChannel implements HandledChannel {
+public abstract class AbstractHandledChannel implements Channel {
     private Queue<Message> queue = new LinkedBlockingQueue<>();
     private Set<Message> polled = new HashSet<>();
     private String name;

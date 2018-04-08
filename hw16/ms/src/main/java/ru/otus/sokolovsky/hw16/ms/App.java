@@ -6,9 +6,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import ru.otus.sokolovsky.hw16.ms.channel.PointToPointChannel;
 import ru.otus.sokolovsky.hw16.ms.cli.OptionsBuilder;
 import ru.otus.sokolovsky.hw16.ms.manage.SystemManager;
 import ru.otus.sokolovsky.hw16.ms.server.ServerListener;
+import ru.otus.sokolovsky.hw16.ms.service.ServiceHandler;
 
 public class App {
     public static void main(String[] args) {
@@ -31,6 +33,10 @@ public class App {
 
         ServerListener listener = (ServerListener) ctx.getBean("serverListener");
         listener.startListening(port);
+
+        PointToPointChannel serviceChannel = systemManager.createPointToPointChannel("service");
+        ServiceHandler serviceHandler = new ServiceHandler(serviceChannel, systemManager);
+        serviceHandler.init();
     }
 
     private static ApplicationContext getAppContext() {
