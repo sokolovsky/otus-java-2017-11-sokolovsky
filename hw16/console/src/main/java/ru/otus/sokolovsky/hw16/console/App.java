@@ -1,7 +1,9 @@
 package ru.otus.sokolovsky.hw16.console;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.otus.sokolovsky.hw16.console.terminal.Terminal;
-import ru.otus.sokolovsky.hw16.console.terminal.contexts.ApplicationContext;
+import ru.otus.sokolovsky.hw16.console.terminal.contexts.ConsoleContext;
 
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -13,13 +15,17 @@ public class App {
     final String MS_INSTANCE_NAME = "ms";
 
     public static void main(String[] args) throws Exception {
-        ApplicationContext applicationContext = new ApplicationContext(new Terminal(new OutputStreamWriter(System.out), new InputStreamReader(System.in)));
-        applicationContext.run();
+        ApplicationContext applicationContext = getApplicationContext();
 
-        // запустить консольное приложение
-        // чтение уведомлений в отдельном потоке (от системы сообщений)
+        ConsoleContext console = (ConsoleContext) applicationContext.getBean("consoleContext");
+        console.run();
+    }
 
-        // командная строка в отдельном потоке с возможностью контроля и выдачи программы помощи
-        // есть единый объект вывода
+    public static Terminal createTerminal() {
+        return new Terminal(new OutputStreamWriter(System.out), new InputStreamReader(System.in));
+    }
+
+    private static org.springframework.context.ApplicationContext getApplicationContext() {
+        return new ClassPathXmlApplicationContext("spring/app-context.xml");
     }
 }

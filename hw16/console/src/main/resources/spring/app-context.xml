@@ -1,0 +1,31 @@
+<!--suppress SpringFacetInspection -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations" value="config.properties"/>
+    </bean>
+
+    <bean id="msRunner" class="ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner">
+        <constructor-arg name="command" value="${ms.jar.location}" />
+    </bean>
+
+    <bean id="increaseDbWorkerAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseDbWorkerAction" scope="prototype" />
+
+    <bean id="increaseWebServerAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseWebServerAction" scope="prototype" />
+
+    <bean id="serviceUpAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.ServiceUpAction" scope="prototype">
+        <constructor-arg name="msRunner" ref="msRunner" />
+    </bean>
+
+    <bean id="consoleContext" class="ru.otus.sokolovsky.hw16.console.terminal.contexts.ConsoleContext">
+        <constructor-arg name="terminal" ref="terminal"/>
+        <lookup-method name="createServiceUpAction" bean="serviceUpAction"/>
+        <lookup-method name="createIncreaseDbWorkerAction" bean="increaseDbWorkerAction"/>
+        <lookup-method name="createIncreaseWebServerAction" bean="increaseWebServerAction"/>
+    </bean>
+
+    <bean id="terminal" class="ru.otus.sokolovsky.hw16.console.App" factory-method="createTerminal" />
+</beans>

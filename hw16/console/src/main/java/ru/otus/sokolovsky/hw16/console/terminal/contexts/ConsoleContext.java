@@ -6,9 +6,9 @@ import ru.otus.sokolovsky.hw16.console.terminal.actions.ServiceUpAction;
 import ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseDbWorkerAction;
 import ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseWebServerAction;
 
-public class ApplicationContext extends Context {
+public abstract class ConsoleContext extends Context {
 
-    public ApplicationContext(Terminal terminal) throws Exception {
+    public ConsoleContext(Terminal terminal) throws Exception {
         super(terminal);
     }
 
@@ -19,9 +19,15 @@ public class ApplicationContext extends Context {
     @Override
     protected Action[] actions() {
         return new Action[] {
-            new ServiceUpAction(),
-            new IncreaseDbWorkerAction(),
-            new IncreaseWebServerAction(),
+            createServiceUpAction(),
+            createIncreaseDbWorkerAction(),
+            createIncreaseWebServerAction(),
         };
     }
+
+    protected abstract ServiceUpAction createServiceUpAction();
+
+    protected abstract IncreaseDbWorkerAction createIncreaseDbWorkerAction();
+
+    protected abstract IncreaseWebServerAction createIncreaseWebServerAction();
 }

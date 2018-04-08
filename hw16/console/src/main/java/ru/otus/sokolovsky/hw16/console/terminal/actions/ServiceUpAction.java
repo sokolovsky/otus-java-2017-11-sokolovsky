@@ -1,17 +1,26 @@
 package ru.otus.sokolovsky.hw16.console.terminal.actions;
 
+import ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner;
 import ru.otus.sokolovsky.hw16.console.terminal.Terminal;
 
-import java.util.Map;
+import java.io.IOException;
 
 public class ServiceUpAction implements Action {
 
-    public ServiceUpAction() {
+    private ApplicationRunner msRunner;
+
+    public ServiceUpAction(ApplicationRunner msRunner) {
+        this.msRunner = msRunner;
     }
 
     @Override
     public void execute(Terminal terminal) {
-        terminal.writeln("....Run process");
+        terminal.writeln("Run process...");
+        try {
+            msRunner.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
