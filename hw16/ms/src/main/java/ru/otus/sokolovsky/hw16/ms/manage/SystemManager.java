@@ -1,7 +1,7 @@
 package ru.otus.sokolovsky.hw16.ms.manage;
 
+import ru.otus.sokolovsky.hw16.integration.message.Message;
 import ru.otus.sokolovsky.hw16.ms.channel.*;
-import ru.otus.sokolovsky.hw16.ms.message.Message;
 
 import java.util.logging.Logger;
 

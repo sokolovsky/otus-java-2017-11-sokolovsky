@@ -1,4 +1,4 @@
-package ru.otus.sokolovsky.hw16.ms.message;
+package ru.otus.sokolovsky.hw16.integration.message;
 
 import java.util.Arrays;
 import java.util.Optional;

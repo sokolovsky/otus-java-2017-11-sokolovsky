@@ -2,9 +2,9 @@ package ru.otus.sokolovsky.hw16.ms.service;
 
 import ru.otus.sokolovsky.hw16.ms.channel.Channel;
 import ru.otus.sokolovsky.hw16.ms.manage.SystemManager;
-import ru.otus.sokolovsky.hw16.ms.message.Message;
-import ru.otus.sokolovsky.hw16.ms.message.MessageTypes;
-import ru.otus.sokolovsky.hw16.ms.message.ParametrizedMessage;
+import ru.otus.sokolovsky.hw16.integration.message.Message;
+import ru.otus.sokolovsky.hw16.integration.message.MessageTypes;
+import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
 
 public class ServiceHandler {
     private Channel channel;

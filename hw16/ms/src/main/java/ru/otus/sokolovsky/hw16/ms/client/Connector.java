@@ -1,7 +1,10 @@
 package ru.otus.sokolovsky.hw16.ms.client;
 
+import ru.otus.sokolovsky.hw16.integration.message.IllegalFormatException;
+import ru.otus.sokolovsky.hw16.integration.message.Message;
+import ru.otus.sokolovsky.hw16.integration.message.MessageTransformer;
+import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
 import ru.otus.sokolovsky.hw16.ms.channel.PointToPointChannel;
-import ru.otus.sokolovsky.hw16.ms.message.*;
 
 import java.io.*;
 import java.net.Socket;
