@@ -9,7 +9,7 @@
     </bean>
 
     <bean id="msRunner" class="ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner">
-        <constructor-arg name="command" value="${ms.jar.location}" />
+        <constructor-arg name="command" value="${ms.run.command}" />
     </bean>
 
     <bean id="increaseDbWorkerAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseDbWorkerAction" scope="prototype" />

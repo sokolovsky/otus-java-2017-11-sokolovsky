@@ -12,7 +12,12 @@ import ru.otus.sokolovsky.hw16.ms.manage.SystemManager;
 import ru.otus.sokolovsky.hw16.ms.server.ServerListener;
 import ru.otus.sokolovsky.hw16.ms.service.ServiceHandler;
 
+import java.util.logging.Logger;
+
 public class App {
+
+    private static final Logger logger = Logger.getLogger("Message System");
+
     public static void main(String[] args) {
         DefaultParser parser = new DefaultParser();
         CommandLine cli;

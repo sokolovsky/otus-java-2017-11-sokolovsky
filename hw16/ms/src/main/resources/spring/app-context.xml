@@ -1,20 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--suppress SpringFacetInspection -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations" value="project.properties"/>
+        <property name="locations" value="META-INF/project.properties"/>
     </bean>
 
     <bean id="serverListener" class="ru.otus.sokolovsky.hw16.ms.server.ServerListenerImpl">
         <property name="connectionHandlers" ref="connectionHandlers"/>
     </bean>
 
-    <bean id="connectionPoolHandler" class="ru.otus.sokolovsky.hw16.ms.manage.ConnectionsPoolHandler"/>
+    <bean id="channelContainer" class="ru.otus.sokolovsky.hw16.ms.channel.ChannelContainerImpl" />
 
-    <util:list id="connectionHandlers">
-        <ref bean="connectionPoolHandler"/>
-    </util:list>
+    <bean id="channelFactory" class="ru.otus.sokolovsky.hw16.ms.channel.ChannelFactoryImpl"/>
+
+    <bean id="systemManager" class="ru.otus.sokolovsky.hw16.ms.manage.SystemManager" >
+        <constructor-arg name="channelContainer" ref="channelContainer"/>
+        <constructor-arg name="channelFactory" ref="channelFactory"/>
+    </bean>
+
+    <bean id="connectionPoolHandler" class="ru.otus.sokolovsky.hw16.ms.manage.ConnectionsPoolHandler">
+        <constructor-arg name="systemManager" ref="systemManager" />
+    </bean>
+
+    <bean id="connectionHandlers" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="sourceList">
+            <list value-type="ru.otus.sokolovsky.hw16.ms.server.ConnectionHandler">
+                <ref bean="connectionPoolHandler"/>
+            </list>
+        </property>
+    </bean>
 </beans>

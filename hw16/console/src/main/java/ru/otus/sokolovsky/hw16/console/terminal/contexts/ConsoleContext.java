@@ -8,7 +8,7 @@ import ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseWebServerAction;
 
 public abstract class ConsoleContext extends Context {
 
-    public ConsoleContext(Terminal terminal) throws Exception {
+    public ConsoleContext(Terminal terminal) {
         super(terminal);
     }
 

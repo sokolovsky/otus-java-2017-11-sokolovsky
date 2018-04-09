@@ -2,11 +2,13 @@ package ru.otus.sokolovsky.hw16.console;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner;
 import ru.otus.sokolovsky.hw16.console.terminal.Terminal;
 import ru.otus.sokolovsky.hw16.console.terminal.contexts.ConsoleContext;
 
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.concurrent.Executors;
 
 public class App {
 
@@ -14,7 +16,7 @@ public class App {
     final String WEB_INSTANCE_NAME = "web";
     final String MS_INSTANCE_NAME = "ms";
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         ApplicationContext applicationContext = getApplicationContext();
 
         ConsoleContext console = (ConsoleContext) applicationContext.getBean("consoleContext");
