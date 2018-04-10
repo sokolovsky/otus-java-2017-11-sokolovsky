@@ -5,6 +5,7 @@ import ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner;
 import ru.otus.sokolovsky.hw16.console.terminal.Terminal;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
 
 public class ServiceUpAction implements Action {
 
@@ -21,10 +22,15 @@ public class ServiceUpAction implements Action {
         try {
             terminal.writeln("Run Message System process...");
             msRunner.start();
-            // setting up the new channel of Database service
-            msRunner.afterStart("Message System was started", () -> msManager.createChannel("DB"));
+
+            msRunner.afterStart("Message System was started", () -> {
+                Executors.newSingleThreadExecutor().submit(msManager);
+            });
             // setting up the new channel of web service
             msRunner.afterStart("Message System was started", () -> msManager.createChannel("CHAT_BROADCAST"));
+
+            // setting up the new channel of Database service
+            msRunner.afterStart("Message System was started", () -> msManager.createChannel("DB"));
         } catch (IOException e) {
             e.printStackTrace();
         }

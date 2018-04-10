@@ -8,6 +8,11 @@
         <property name="locations" value="config.properties"/>
     </bean>
 
+    <bean id="msManager" class="ru.otus.sokolovsky.hw16.console.ms.MessageSystemManager">
+        <constructor-arg name="host" value="${ms.connection.host}"/>
+        <constructor-arg name="port" value="${ms.connection.port}"/>
+    </bean>
+
     <bean id="msRunner" class="ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner">
         <constructor-arg name="command" value="${ms.run.command}" />
     </bean>
@@ -18,6 +23,7 @@
 
     <bean id="serviceUpAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.ServiceUpAction" scope="prototype">
         <constructor-arg name="msRunner" ref="msRunner" />
+        <constructor-arg name="msManager" ref="msManager" />
     </bean>
 
     <bean id="consoleContext" class="ru.otus.sokolovsky.hw16.console.terminal.contexts.ConsoleContext">

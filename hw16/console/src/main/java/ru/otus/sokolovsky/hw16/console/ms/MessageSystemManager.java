@@ -4,6 +4,7 @@ import ru.otus.sokolovsky.hw16.integration.message.*;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -29,10 +30,14 @@ public class MessageSystemManager implements Runnable {
         try (Socket socket = new Socket(host, port)) {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    Message message = queue.take();
+                    Message message = queue.take(); // Blocks
                     OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream());
-                    writer.write(MessageTransformer.toJson((ParametrizedMessage) message));
-                    writer.write("\n");
+                    PrintWriter sender = new PrintWriter(writer);
+                    String json = MessageTransformer.toJson((ParametrizedMessage) message);
+                    sender.println(json);
+                    sender.println();
+                    sender.flush();
+                    System.out.println("sent: " + json);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     return;

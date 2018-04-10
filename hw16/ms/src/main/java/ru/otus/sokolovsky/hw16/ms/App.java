@@ -34,14 +34,17 @@ public class App {
         ApplicationContext ctx = getAppContext();
 
         SystemManager systemManager = (SystemManager) ctx.getBean("systemManager");
-        systemManager.initService();
 
         ServerListener listener = (ServerListener) ctx.getBean("serverListener");
         listener.startListening(port);
 
+        System.out.println(ctx.getBean("connectionHandlers"));
+
         PointToPointChannel serviceChannel = systemManager.createPointToPointChannel("service");
         ServiceHandler serviceHandler = new ServiceHandler(serviceChannel, systemManager);
         serviceHandler.init();
+
+        System.out.println("Message System was started");
     }
 
     private static ApplicationContext getAppContext() {

@@ -31,8 +31,6 @@ public class ApplicationRunner {
 
         processListener.setStream(process.getInputStream());
         processListener.start();
-
-        System.out.println("Message System was started " + process.info() + " \n and is alive - " + process.isAlive());
     }
 
     public void stop() {
@@ -66,7 +64,7 @@ public class ApplicationRunner {
             if (functions == null) {
                 return;
             }
-            functions.parallelStream().forEach(Runnable::run);
+            functions.forEach(Runnable::run);
         }
 
         @Override
@@ -74,7 +72,7 @@ public class ApplicationRunner {
             if (is == null) {
                 throw new IllegalStateException("Need input stream to handle");
             }
-            logger.info("Start listening another program...");
+            System.out.println("Start interact with program");
             try (InputStreamReader isr = new InputStreamReader(is)) {
                 BufferedReader br = new BufferedReader(isr);
                 String line;

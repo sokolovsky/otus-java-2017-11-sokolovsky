@@ -56,7 +56,7 @@ public class ServerListenerImpl implements ServerListener {
 
     @Override
     public void setConnectionHandlers(List<ConnectionHandler> handlers) {
-
+        this.handlers = handlers;
     }
 
     public void dispose() throws IOException {

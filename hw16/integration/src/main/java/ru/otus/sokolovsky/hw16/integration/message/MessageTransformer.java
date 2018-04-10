@@ -8,10 +8,10 @@ import java.util.Iterator;
 public class MessageTransformer {
     public static ParametrizedMessage fromJson(String json) throws IllegalFormatException {
         JSONObject rootJson = new JSONObject(json);
-        JSONObject headers = rootJson.optJSONObject("headers");
-        JSONObject body = rootJson.optJSONObject("body");
-        String destination = rootJson.getString("destination");
-        String name = rootJson.getString("name");
+        JSONObject headers = rootJson.getJSONObject("headers");
+        JSONObject body = rootJson.getJSONObject("body");
+        String destination = rootJson.optString("destination");
+        String name = rootJson.optString("name");
         ParametrizedMessage message;
         try {
             String type = rootJson.getString("type");
@@ -28,26 +28,31 @@ public class MessageTransformer {
 
         for (Iterator<String> it = body.keys(); it.hasNext(); ) {
             String key = it.next();
-            message.setParameter(key, headers.getString(key));
+            message.setParameter(key, body.getString(key));
         }
-
         return message;
     }
 
     public static String toJson(ParametrizedMessage message) {
         StringBuilder stringBuilder = new StringBuilder();
         JSONWriter rootBuilder = new JSONWriter(stringBuilder);
+        rootBuilder.object();
         rootBuilder.key("type").value(message.getType().getCode());
         rootBuilder.key("destination").value(message.getDestination());
         rootBuilder.key("source").value(message.getSource());
-        JSONWriter headers = rootBuilder.key("headers");
+        rootBuilder.key("name").value(message.getName());
+        JSONWriter headers = rootBuilder.key("headers").object();
         message.getHeaders().forEach((k, v) -> {
             headers.key(k).value(v);
         });
-        JSONWriter body = rootBuilder.key("body");
+        headers.endObject();
+
+        JSONWriter body = rootBuilder.key("body").object();
         message.getParameters().forEach((n, v) -> {
             body.key(n).value(v);
         });
-        return rootBuilder.toString();
+        body.endObject();
+        rootBuilder.endObject();
+        return stringBuilder.toString();
     }
 }

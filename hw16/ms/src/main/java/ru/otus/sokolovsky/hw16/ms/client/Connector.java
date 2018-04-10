@@ -41,21 +41,26 @@ public class Connector implements Runnable, AutoCloseable{
 
     @Override
     public void run() {
-        while (socket.isConnected()) {
-            try (InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream())) {
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String row = bufferedReader.readLine();
-                logger.info("Read message: " + row);
-                ParametrizedMessage message = MessageTransformer.fromJson(row);
+        try (InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream())) {
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            while (socket.isConnected()) {
+                String row = bufferedReader.readLine(); // Blocks
+                if (row.trim().length() == 0) {
+                    continue;
+                }
+                ParametrizedMessage message;
+                try {
+                    message = MessageTransformer.fromJson(row);
+                } catch (IllegalFormatException e) {
+                    e.printStackTrace();
+                    continue;
+                }
                 message.setSource(channel.getName());
                 messageReceiver.accept(message);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            } catch (IllegalFormatException e) {
-                e.printStackTrace();
-                continue;
             }
+        } catch (IOException e) {
+            System.out.println("IO Exception: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
