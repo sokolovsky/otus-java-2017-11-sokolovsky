@@ -1,4 +1,4 @@
-package ru.otus.sokolovsky.hw16.ms.service;
+package ru.otus.sokolovsky.hw16.integration.control;
 
 public enum ServiceActions {
     CREATE_NEW_NAMED_CHANNEL("create-new-named-channel"),
