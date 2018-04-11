@@ -13,8 +13,19 @@
         <constructor-arg name="port" value="${ms.connection.port}"/>
     </bean>
 
+    <!--The single instance of system-->
     <bean id="msRunner" class="ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner">
         <constructor-arg name="command" value="${ms.run.command}" />
+    </bean>
+
+    <!--Could be in many instances-->
+    <bean id="dbRunner" class="ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner" scope="prototype">
+        <constructor-arg name="command" value="${db.run.command}" />
+    </bean>
+
+    <!--Could be in many instances-->
+    <bean id="webRunner" class="ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner" scope="prototype">
+        <constructor-arg name="command" value="${web.run.command}" />
     </bean>
 
     <bean id="increaseDbWorkerAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseDbWorkerAction" scope="prototype" />
@@ -24,6 +35,8 @@
     <bean id="serviceUpAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.ServiceUpAction" scope="prototype">
         <constructor-arg name="msRunner" ref="msRunner" />
         <constructor-arg name="msManager" ref="msManager" />
+        <property name="dbRunner" ref="dbRunner" />
+        <property name="webRunner" ref="webRunner" />
     </bean>
 
     <bean id="consoleContext" class="ru.otus.sokolovsky.hw16.console.terminal.contexts.ConsoleContext">
