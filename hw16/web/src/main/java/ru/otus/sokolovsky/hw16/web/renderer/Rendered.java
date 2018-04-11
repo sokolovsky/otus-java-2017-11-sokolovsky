@@ -5,6 +5,8 @@ import java.util.Map;
 
 public interface Rendered {
 
+    void setRenderer(Renderer renderer);
+
     Renderer getRenderer();
 
     void setTemplate(String template);
