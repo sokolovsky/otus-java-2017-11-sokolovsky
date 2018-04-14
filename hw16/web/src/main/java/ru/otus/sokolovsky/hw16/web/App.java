@@ -4,88 +4,52 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.log.StdErrLog;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.xml.XmlConfiguration;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.otus.sokolovsky.hw16.web.cli.OptionsBuilder;
-import ru.otus.sokolovsky.hw16.web.filters.AuthFilter;
-import ru.otus.sokolovsky.hw16.web.renderer.Rendered;
-import ru.otus.sokolovsky.hw16.web.renderer.Renderer;
-import ru.otus.sokolovsky.hw16.web.renderer.RendererImpl;
-import ru.otus.sokolovsky.hw16.web.servlet.ChatInitServlet;
-import ru.otus.sokolovsky.hw16.web.servlet.LoginServlet;
 import ru.otus.sokolovsky.hw16.web.servlet.ServletConfigurator;
-
-import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServlet;
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
+@Configurable
 public class App {
 
     private static class Params {
+        int wsPort;
         int webPort;
         int msPort;
     }
 
-    // todo DI
-    private static final Renderer renderer = new RendererImpl("templates/layout.ftl");
-
-    private final static Map<String, ServletHolder> siteMap = new HashMap<>() {{
-        put("/login", forConfigure(new LoginServlet()).toDo((s) -> {
-            Rendered r = (Rendered) s;
-            r.setRenderer(renderer);
-            r.setTemplate("/templates/login.ftl".replace("/", File.separator));
-        }).getHolder());
-
-        put("/static/*", forConfigure(new DefaultServlet()).withHolder(h -> {
-            h.setName("static");
-            h.setInitParameter("resourceBase", resourcePath("assets").toExternalForm());
-            h.setInitParameter("dirAllowed","true");
-            h.setInitParameter("pathInfoOnly","true");
-        }).getHolder());
-
-        put("/", forConfigure(new ChatInitServlet()).toDo(s -> {
-            Rendered r = (Rendered) s;
-            r.setRenderer(renderer);
-            r.setTemplate("templates/cache_view.ftl".replace("/", File.separator));
-        }).withHolder(h -> {
-            h.setInitParameter("dirAllowed","true");
-        }).getHolder());
-    }};
-
     public static void main(String[] args) throws Exception {
-        // init web service with port and message system port
-
+        App app = new App();
         Params cliParams = handleParams(args);
-        launchWebServer(cliParams.webPort);
-        connectWithMessageSystem(cliParams.msPort);
+        ApplicationContext appContext = getAppContext();
+        appContext.getAutowireCapableBeanFactory().autowireBean(app);
+        app.launchWebServer(cliParams.webPort);
+        app.connectWithMessageSystem(cliParams.msPort);
+        app.launchSocketServer(cliParams.wsPort);
     }
 
-    private static void connectWithMessageSystem(int msPort) {
+    private void launchSocketServer(int port) {
+    }
+
+    private void connectWithMessageSystem(int port) {
         // todo organize connection
     }
 
-    private static void launchWebServer(int webPort) throws Exception {
+    private void launchWebServer(int webPort) throws Exception {
 
-        Resource assets = Resource.newResource(resourcePath("assets").toExternalForm());
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setBaseResource(assets);
-        siteMap.forEach((k, v) -> context.addServlet(v, k));
-        context.addFilter(AuthFilter.class, "/", EnumSet.of(DispatcherType.REQUEST));
-
-        Server server = new Server(webPort);
-        Log.setLog(new StdErrLog());
-        server.setHandler(context);
-
+        Resource xml = Resource.newSystemResource("/config/web-server-config.xml");
+        XmlConfiguration configuration = new XmlConfiguration(xml.getInputStream());
+        Server server = (Server)configuration.configure();
+        ServerConnector connector = new ServerConnector(server);
+        connector.setPort(webPort);
         server.start();
+        server.join();
     }
 
     private static ServletConfigurator forConfigure(HttpServlet servlet) {
@@ -95,6 +59,10 @@ public class App {
     private static URL resourcePath(String path) {
         ClassLoader classLoader = App.class.getClassLoader();
         return classLoader.getResource(path);
+    }
+
+    private static ApplicationContext getAppContext() {
+        return new ClassPathXmlApplicationContext("config/app-context.xml");
     }
 
     private static Params handleParams(String ...cliArgs) {
@@ -109,11 +77,12 @@ public class App {
 
         String sListeningPort = cli.getOptionValue(OptionsBuilder.LISTENING_PORT, null);
         String sMSPort = cli.getOptionValue(OptionsBuilder.MESSAGE_SYSTEM_CONNECTION_PORT, null);
+        String wsPort = cli.getOptionValue(OptionsBuilder.WEB_SOCKET_PORT, null);
 
         Params params = new Params();
         params.webPort = Integer.parseInt(sListeningPort);
         params.msPort = Integer.parseInt(sMSPort);
+        params.wsPort = Integer.parseInt(wsPort);
         return params;
     }
-
 }

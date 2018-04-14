@@ -7,11 +7,13 @@ public class OptionsBuilder {
 
     public static final String LISTENING_PORT = "port";
     public static final String MESSAGE_SYSTEM_CONNECTION_PORT = "msport";
+    public static final String WEB_SOCKET_PORT = "wsport";
 
     public static Options build() {
         Options options = new Options();
         options.addOption(buildPortOption());
         options.addOption(buildMSPortOption());
+        options.addOption(buildWebSocketPortOption());
         return options;
     }
 
@@ -19,6 +21,15 @@ public class OptionsBuilder {
         return Option.builder(LISTENING_PORT)
                 .longOpt(LISTENING_PORT)
                 .desc("Used for control connection. Integer value with range from 1024 to 65536")
+                .valueSeparator()
+                .hasArg(true)
+                .build();
+    }
+
+    private static Option buildWebSocketPortOption() {
+        return Option.builder(WEB_SOCKET_PORT)
+                .longOpt(WEB_SOCKET_PORT)
+                .desc("Used for web socket connection. Integer value with range from 1024 to 65536")
                 .valueSeparator()
                 .hasArg(true)
                 .build();

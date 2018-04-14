@@ -3,8 +3,8 @@ package ru.otus.sokolovsky.hw16.web.servlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import ru.otus.sokolovsky.hw15.renderer.Rendered;
-import ru.otus.sokolovsky.hw15.renderer.Renderer;
+import ru.otus.sokolovsky.hw16.web.renderer.Rendered;
+import ru.otus.sokolovsky.hw16.web.renderer.Renderer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,6 +32,10 @@ abstract public class RenderedServlet extends HttpServlet implements Rendered {
     @Override
     public Renderer getRenderer() {
         return renderer;
+    }
+
+    public void setRenderer(Renderer renderer) {
+        this.renderer = renderer;
     }
 
     @Override

@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+
+<Configure id="server" class="org.eclipse.jetty.server.Server">
+    <New id="renderer" class="ru.otus.sokolovsky.hw16.web.renderer.RendererImpl">
+        <Arg>/templates/layout.ftl</Arg>
+    </New>
+    <New id="context" class="org.eclipse.jetty.servlet.ServletContextHandler">
+        <Set name="resourceBase">/assets</Set>
+        <Set name="contextPath">/</Set>
+        <Call name="addServlet">
+            <Arg>
+                <New class="org.eclipse.jetty.servlet.ServletHolder">
+                    <New class="ru.otus.sokolovsky.hw16.web.servlet.LoginServlet">
+                        <Call name="setTemplate" >
+                            <Arg>/templates/login.ftl</Arg>
+                        </Call>
+                        <Call name="setRenderer">
+                            <Arg><Ref refid="renderer" /></Arg>
+                        </Call>
+                    </New>
+                </New>
+            </Arg>
+            <Arg>/login</Arg>
+        </Call>
+        <Call name="addServlet">
+            <Arg>
+                <New class="org.eclipse.jetty.servlet.ServletHolder">
+                    <Arg>
+                        <New class="org.eclipse.jetty.servlet.DefaultServlet" />
+                    </Arg>
+                    <Call name="setInitParameter">
+                        <Arg>resourceBase</Arg>
+                        <Arg>/assets</Arg>
+                    </Call>
+                    <Call name="setInitParameter">
+                        <Arg>dirAllowed</Arg>
+                        <Arg>true</Arg>
+                    </Call>
+                    <Call name="setInitParameter">
+                        <Arg>pathInfoOnly</Arg>
+                        <Arg>true</Arg>
+                    </Call>
+                </New>
+            </Arg>
+        </Call>
+        <Call name="addServlet">
+            <Arg>
+                <New class="org.eclipse.jetty.servlet.ServletHolder">
+                    <Arg>
+                        <New class="ru.otus.sokolovsky.hw16.web.servlet.ChatInitServlet">
+                            <Call name="setTemplate">
+                                <Arg>templates/cache_view.ftl</Arg>
+                            </Call>
+                            <Call name="setRenderer">
+                                <Arg><Ref refid="renderer" /></Arg>
+                            </Call>
+                        </New>
+                    </Arg>
+                    <Call name="setInitParameter">
+                        <Arg>dirAllowed</Arg>
+                        <Arg>true</Arg>
+                    </Call>
+                </New>
+            </Arg>
+        </Call>
+        <Call name="addFilter">
+            <Arg>ru.otus.sokolovsky.hw16.web.filters.AuthFilter</Arg>
+            <Arg>/</Arg>
+            <Array>
+                <Item>javax.servlet.DispatcherType.REQUEST</Item>
+            </Array>
+        </Call>
+    </New>
+    <Set name="handler">
+        <New class="org.eclipse.jetty.server.handler.HandlerCollection">
+            <Call name="addHandler">
+                <Arg><Ref refid="context" /></Arg>
+            </Call>
+        </New>
+    </Set>
+</Configure>

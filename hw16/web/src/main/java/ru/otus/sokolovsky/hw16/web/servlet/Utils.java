@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 
-abstract public class Utils {
+public abstract class Utils {
     static void responseOk(HttpServletResponse response) {
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
