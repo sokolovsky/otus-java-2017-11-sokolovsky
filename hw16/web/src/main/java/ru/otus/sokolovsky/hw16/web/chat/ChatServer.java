@@ -11,5 +11,5 @@ public interface ChatServer {
 
     void send(String message, String destination);
 
-    void start();
+    void listen();
 }

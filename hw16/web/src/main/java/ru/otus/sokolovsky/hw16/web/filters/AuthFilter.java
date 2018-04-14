@@ -14,6 +14,10 @@ public class AuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
+        if (request.getServletPath().equals("/login")) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
         HttpSession session = request.getSession();
         Object login = session.getAttribute("login");
         if (login != null) {

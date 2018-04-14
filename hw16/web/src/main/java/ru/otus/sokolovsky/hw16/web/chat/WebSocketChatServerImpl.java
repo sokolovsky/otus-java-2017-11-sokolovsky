@@ -97,6 +97,12 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
         webSocket.send(message);
     }
 
+    @Override
+    public void listen() {
+        System.out.println("Start listening port " + getPort());
+        this.start();
+    }
+
     private Optional<String> parseLogin(String str) {
         Matcher matcher = channelTestPattern.matcher(str);
         if (!matcher.find()) {

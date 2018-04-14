@@ -6,10 +6,17 @@
        http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations" value="config/project.properties"/>
+        <property name="locations" value="/META-INF/config/project.properties"/>
     </bean>
 
     <bean id="renderer" class="ru.otus.sokolovsky.hw16.web.renderer.RendererImpl">
         <constructor-arg name="layout" value="templates/layout.ftl"/>
+    </bean>
+
+    <bean id="chatServer" class="ru.otus.sokolovsky.hw16.web.chat.WebSocketChatServerImpl">
+        <constructor-arg name="port" value="${webSocket.port}" />
+    </bean>
+    <bean id="app" class="ru.otus.sokolovsky.hw16.web.App">
+        <constructor-arg name="chatServer" ref="chatServer" />
     </bean>
 </beans>

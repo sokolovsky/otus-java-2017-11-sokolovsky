@@ -31,7 +31,7 @@ public class LoginServlet extends RenderedServlet {
 
         if (hasPassword(login, pass)) {
             req.getSession().setAttribute("login", login);
-            resp.sendRedirect("/");
+            resp.sendRedirect("/chat");
             return;
         }
 
