@@ -10,7 +10,7 @@ $(() => {
             console.log('Connection is set up');
             console.log(arguments);
         },
-        onmessage: function () {
+        onmessage: function (event) {
             let data = $.parseJSON(event.data);
             newMessage(data, data.login === login);
         }

@@ -8,6 +8,7 @@ import ru.otus.sokolovsky.hw16.integration.message.Message;
 import ru.otus.sokolovsky.hw16.integration.message.MessageFactory;
 import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public class ChatServiceImpl implements ChatService {
@@ -38,10 +39,16 @@ public class ChatServiceImpl implements ChatService {
     public void handleRequest(String json) {
         System.out.println("To handle request: " + json);
         JSONObject rootJson = new JSONObject(json);
-        ParametrizedMessage parametrizedMessage = MessageFactory.createRequestResponseMessage("DB", "register-new-message");
-        parametrizedMessage.setParameter("login", rootJson.getString("login"));
-        parametrizedMessage.setParameter("text", rootJson.getString("message"));
-        msConnector.sendMessage(parametrizedMessage);
+        ParametrizedMessage toDBMessage = MessageFactory.createRequestResponseMessage("DB", "register-new-message");
+        toDBMessage.setParameter("login", rootJson.getString("login"));
+        toDBMessage.setParameter("text", rootJson.getString("message"));
+        msConnector.sendMessage(toDBMessage);
+
+        ParametrizedMessage toChat = MessageFactory.createRequestResponseMessage("CHAT_BROADCAST", "new-message");
+        toChat.setParameter("login", rootJson.getString("login"));
+        toChat.setParameter("text", rootJson.getString("message"));
+        toChat.setParameter("time", LocalDateTime.now().toString());
+        msConnector.sendMessage(toChat);
     }
 
     private String messageToJson(ChatMessage message) {
@@ -52,7 +59,7 @@ public class ChatServiceImpl implements ChatService {
         rootBuilder.key("time").value(message.getTime());
         rootBuilder.key("message").value(message.getText());
         rootBuilder.endObject();
-        return rootBuilder.toString();
+        return stringBuilder.toString();
     }
 
     @Override
@@ -74,7 +81,7 @@ public class ChatServiceImpl implements ChatService {
             ParametrizedMessage pMessage = (ParametrizedMessage) m;
             Map<String, String> parameters = pMessage.getParameters();
             ChatMessage chatMessage = new ChatMessage(
-                    parameters.get("author"),
+                    parameters.get("login"),
                     parameters.get("time"),
                     parameters.get("text")
             );
