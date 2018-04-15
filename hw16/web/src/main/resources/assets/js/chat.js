@@ -63,7 +63,6 @@ $(() => {
         const messageContainer = createMessageElement(data.login, time, data.message);
 
         includeMessage(messageContainer);
-        clearInputArea();
         scrollMessages();
 
         if (!self) {
@@ -82,11 +81,13 @@ $(() => {
 
     $(container).find('.submit').click(function() {
         send();
+        clearInputArea()
     });
 
     $(window).on('keydown', function(e) {
         if (e.which === 13) {
             send();
+            clearInputArea();
             return false;
         }
     });

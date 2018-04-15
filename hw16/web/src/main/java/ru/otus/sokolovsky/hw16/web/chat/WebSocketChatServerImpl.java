@@ -2,7 +2,9 @@ package ru.otus.sokolovsky.hw16.web.chat;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
+import ru.otus.sokolovsky.hw16.integration.client.Connector;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.function.Consumer;
@@ -10,6 +12,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocketServer implements ChatServer {
+
+    Connector msConnector;
+
     private static Pattern channelTestPattern = Pattern.compile("^/chat-");
 
     private List<Consumer<String>> messageHandlers = new ArrayList<>();
@@ -101,6 +106,17 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
     public void listen() {
         System.out.println("Start listening port " + getPort());
         this.start();
+    }
+
+    @Override
+    public void close() {
+        try {
+            this.stop();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private Optional<String> parseLogin(String str) {

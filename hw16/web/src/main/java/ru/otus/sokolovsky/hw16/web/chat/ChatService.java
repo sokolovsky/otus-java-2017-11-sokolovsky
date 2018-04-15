@@ -1,9 +1,13 @@
 package ru.otus.sokolovsky.hw16.web.chat;
 
-public interface ChatService {
+public interface ChatService extends AutoCloseable {
+    void start();
+
+    void close();
+
     void handleRequest(String request);
 
-    void pushMessage(String message);
+    void pushMessage(ChatMessage message);
 
-    void pushMessage(String message, String user);
+    void pushMessage(ChatMessage message, String user);
 }

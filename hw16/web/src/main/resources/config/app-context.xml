@@ -16,8 +16,14 @@
     <bean id="chatServer" class="ru.otus.sokolovsky.hw16.web.chat.WebSocketChatServerImpl">
         <constructor-arg name="port" value="${webSocket.port}" />
     </bean>
+
+    <bean id="chatService" class="ru.otus.sokolovsky.hw16.web.chat.ChatServiceImpl">
+        <constructor-arg name="chatServer" ref="chatServer"/>
+        <constructor-arg name="connector" ref="msConnector"/>
+    </bean>
+
     <bean id="app" class="ru.otus.sokolovsky.hw16.web.App">
-        <constructor-arg name="chatServer" ref="chatServer" />
+        <constructor-arg name="chatService" ref="chatService" />
         <constructor-arg name="connector" ref="msConnector" />
     </bean>
 

@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.otus.sokolovsky.hw16.integration.client.Connector;
 import ru.otus.sokolovsky.hw16.web.chat.ChatServer;
+import ru.otus.sokolovsky.hw16.web.chat.ChatService;
 import ru.otus.sokolovsky.hw16.web.cli.OptionsBuilder;
 
 @Configurable
@@ -31,7 +32,7 @@ public class App {
     }
 
     @Autowired
-    private ChatServer chatServer;
+    private ChatService chatService;
 
     @Autowired
     private Connector msConnector;
@@ -44,13 +45,13 @@ public class App {
         app.launchChatServer();
     }
 
-    public App(ChatServer chatServer, Connector connector) {
-        this.chatServer = chatServer;
+    public App(ChatService chatService, Connector connector) {
+        this.chatService = chatService;
         msConnector = connector;
     }
 
     private void launchChatServer() {
-        chatServer.listen();
+        chatService.start();
     }
 
     private void connectWithMessageSystem(int port) {

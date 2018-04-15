@@ -29,7 +29,6 @@ public class GetLastMessagesHandler extends AbstractHandler {
             UserDataSet author = userRepo.read(dbMessage.getAuthorId());
             dbMessage.setAuthor(author.getLogin());
         });
-
         Message replyMessage = MessageFactory.generateReplyMessage(message);
         getSender().accept(replyMessage);
     }
