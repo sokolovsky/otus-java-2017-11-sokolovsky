@@ -28,7 +28,7 @@ public class ConnectionsPoolHandler implements ConnectionHandler {
 
     @Override
     public void handle(Socket socket) {
-        System.out.println("MS got socket with port" + socket.getPort());
+        System.out.println("MS got socket with port:" + socket.getPort());
         PointToPointChannel channel = msManager.createPointToPointChannel(getNewChannelName());
         connectionChannels.put(channel.getName(), channel);
         Connector connector = new Connector(socket, channel, msManager::routeMessage);

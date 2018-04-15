@@ -11,12 +11,14 @@ public class MessageTransformer {
         JSONObject headers = rootJson.getJSONObject("headers");
         JSONObject body = rootJson.getJSONObject("body");
         String destination = rootJson.optString("destination");
+        String source = rootJson.optString("source");
         String name = rootJson.optString("name");
         ParametrizedMessage message;
         try {
             String type = rootJson.getString("type");
             MessageType messageType = MessageType.byCode(type);
             message = new ParametrizedMessageImpl(destination, name, messageType);
+            message.setSource(source);
         } catch (IllegalArgumentException e) {
             throw new IllegalFormatException(e);
         }

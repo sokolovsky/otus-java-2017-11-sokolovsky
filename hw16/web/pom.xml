@@ -63,6 +63,11 @@
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <dependency>
+            <groupId>ru.otus.sokolovsky.hw16</groupId>
+            <artifactId>integration</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>web</finalName>

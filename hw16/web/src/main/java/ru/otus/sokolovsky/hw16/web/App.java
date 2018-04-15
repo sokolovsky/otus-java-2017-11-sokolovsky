@@ -7,13 +7,11 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.xml.XmlConfiguration;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Component;
+import ru.otus.sokolovsky.hw16.integration.client.Connector;
 import ru.otus.sokolovsky.hw16.web.chat.ChatServer;
 import ru.otus.sokolovsky.hw16.web.cli.OptionsBuilder;
 
@@ -25,21 +23,30 @@ public class App {
         int msPort;
     }
 
+    private final static App instance;
+
+    static {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/config/app-context.xml");
+        instance = (App) context.getBean("app");
+    }
+
     @Autowired
     private ChatServer chatServer;
 
+    @Autowired
+    private Connector msConnector;
+
     public static void main(String[] args) throws Exception {
         Params cliParams = handleParams(args);
-        ApplicationContext appContext = getAppContext();
-        App app = (App) appContext.getBean("app");
-        appContext.getAutowireCapableBeanFactory().autowireBean(app);
+        App app = getInstance();
         app.launchWebServer(cliParams.webPort);
         app.connectWithMessageSystem(cliParams.msPort);
         app.launchChatServer();
     }
 
-    public App(ChatServer chatServer) {
+    public App(ChatServer chatServer, Connector connector) {
         this.chatServer = chatServer;
+        msConnector = connector;
     }
 
     private void launchChatServer() {
@@ -47,7 +54,8 @@ public class App {
     }
 
     private void connectWithMessageSystem(int port) {
-        // todo organize connection
+        msConnector.setPort(port);
+        msConnector.connect();
     }
 
     private void launchWebServer(int webPort) throws Exception {
@@ -87,5 +95,13 @@ public class App {
         params.webPort = Integer.parseInt(sListeningPort);
         params.msPort = Integer.parseInt(sMSPort);
         return params;
+    }
+
+    public static App getInstance() {
+        return instance;
+    }
+
+    public static Connector getMSConnector() {
+        return instance.msConnector;
     }
 }

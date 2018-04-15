@@ -18,7 +18,6 @@ public class Connector implements Runnable, AutoCloseable{
     private Socket socket;
     private PointToPointChannel channel;
     private Consumer<Message> messageReceiver;
-    private static Logger logger = Logger.getLogger(Connector.class.getName());
 
     public Connector(Socket socket, PointToPointChannel privateChannel, Consumer<Message> messageReceiver) {
         this.socket = socket;
@@ -29,22 +28,29 @@ public class Connector implements Runnable, AutoCloseable{
 
     private void sendMessage(Message message) {
         ParametrizedMessage pMessage = (ParametrizedMessage) message;
-        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream())) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
             BufferedWriter writer = new BufferedWriter(outputStreamWriter);
             writer.write(MessageTransformer.toJson(pMessage));
             writer.newLine();
-            socket.getOutputStream();
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void log(String message) {
+        System.out.println(channel.getName() + ": " + message);
+    }
+
     @Override
     public void run() {
         try (InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream())) {
+            log("Start listening stream, thread - " + Thread.currentThread().toString());
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             while (socket.isConnected()) {
                 String row = bufferedReader.readLine(); // Blocks
+                log("Catch message: "+ row);
                 if (row.trim().length() == 0) {
                     continue;
                 }
@@ -59,7 +65,7 @@ public class Connector implements Runnable, AutoCloseable{
                 messageReceiver.accept(message);
             }
         } catch (IOException e) {
-            System.out.println("IO Exception: " + e.getMessage());
+            System.out.println("IO Exception: " + e.getMessage() + ", Channel: " + channel.getName());
             e.printStackTrace();
         }
     }

@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.otus.sokolovsky.hw16.db.cli.OptionsBuilder;
 import ru.otus.sokolovsky.hw16.integration.client.Connector;
+import ru.otus.sokolovsky.hw16.integration.control.ChannelType;
 import ru.otus.sokolovsky.hw16.integration.control.ServiceAction;
 import ru.otus.sokolovsky.hw16.integration.message.MessageFactory;
 import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
@@ -24,8 +25,11 @@ public class App {
         connector.connect();
 
         ParametrizedMessage subscribeControlMessage = MessageFactory.createControlMessage(ServiceAction.SUBSCRIBE_ON_CHANNEL);
-        subscribeControlMessage.setParameter("name", "DB");
+        subscribeControlMessage.setParameter("channel", "DB");
+        subscribeControlMessage.setParameter("channelType", ChannelType.POINT_TO_POINT.name());
         connector.sendMessage(subscribeControlMessage);
+
+        System.out.println("DB service has being started");
     }
 
     private static ApplicationContext getAppContext() {

@@ -8,7 +8,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-abstract public class RenderedServlet extends HttpServlet implements Rendered {
+abstract public class RenderedServlet extends ApplicationHttpServlet implements Rendered {
 
     private Renderer renderer;
 

@@ -7,18 +7,15 @@ import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 public class ConnectorImpl implements Connector {
     private int port;
     private Socket socket;
-    private List<Consumer<Message>> handlers = new ArrayList<>();
+    private List<Consumer<Message>> handlers = new LinkedList<>();
     private BlockingQueue<Message> dispatchQueue = new ArrayBlockingQueue<>(10);
 
     @Override
@@ -53,8 +50,29 @@ public class ConnectorImpl implements Connector {
     }
 
     @Override
+    public Message sendMessageAndWaitResponse(Message message, int waitingInSec) throws InterruptedException {
+        String code = "" + System.identityHashCode(message);
+        message.setHeader("i-hash-code", code);
+        sendMessage(message);
+        BlockingQueue<Message> block = new LinkedBlockingQueue<>();
+        Consumer<Message> handler = (Message responseMessage) -> {
+            if (responseMessage.getHeaders().get("i-hash-code").equals(code)) {
+                block.add(responseMessage);
+            }
+        };
+        addMessageHandler(handler);
+        Message response = block.poll(waitingInSec, TimeUnit.SECONDS);
+        handlers.remove(handler);
+        return response;
+    }
+
+    @Override
     public void addMessageHandler(Consumer<Message> handler) {
         handlers.add(handler);
+    }
+
+    public void setDispatchQueue(BlockingQueue<Message> dispatchQueue) {
+        this.dispatchQueue = dispatchQueue;
     }
 
     @Override

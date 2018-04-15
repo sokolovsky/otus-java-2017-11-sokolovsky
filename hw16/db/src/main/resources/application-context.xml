@@ -39,25 +39,28 @@
     <bean id="chatMessage" class="ru.otus.sokolovsky.hw16.db.db.ChatMessageDataSet" scope="prototype"
           lazy-init="true"/>
 
-    <bean id="msRouter" class="ru.otus.sokolovsky.hw16.db.ms.MessageRouter">
+    <bean id="msRouter" class="ru.otus.sokolovsky.hw16.integration.client.MessageRouter">
         <property name="actionHandlers">
             <map>
-                <entry key="ru.otus.sokolovsky.hw16.db.ms.Actions.CHECK_USER">
+                <entry key="check-user">
                     <bean class="ru.otus.sokolovsky.hw16.db.ms.CheckUserHandler">
                         <constructor-arg name="userRepo" ref="userDbRepository"/>
+                        <property name="connector" ref="msConnector"/>
                     </bean>
                 </entry>
-                <entry key="ru.otus.sokolovsky.hw16.db.ms.Actions.REGISTER_NEW_MESSAGE">
+                <entry key="get-last-messages">
                     <bean class="ru.otus.sokolovsky.hw16.db.ms.RegisterNewMessageHandler">
                         <constructor-arg name="userRepo" ref="userDbRepository"/>
                         <constructor-arg name="chatRepo" ref="chatDbRepository"/>
+                        <property name="connector" ref="msConnector"/>
                     </bean>
                 </entry>
-                <entry key="ru.otus.sokolovsky.hw16.db.ms.Actions.GET_LAST_MESSAGES">
+                <entry key="register-new-message">
                     <bean class="ru.otus.sokolovsky.hw16.db.ms.GetLastMessagesHandler">
                         <constructor-arg name="chatRepo" ref="chatDbRepository"/>
                         <constructor-arg name="userRepo" ref="userDbRepository"/>
                         <constructor-arg name="limit" value="10"/>
+                        <property name="connector" ref="msConnector"/>
                     </bean>
                 </entry>
             </map>

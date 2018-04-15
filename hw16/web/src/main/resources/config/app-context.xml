@@ -18,5 +18,27 @@
     </bean>
     <bean id="app" class="ru.otus.sokolovsky.hw16.web.App">
         <constructor-arg name="chatServer" ref="chatServer" />
+        <constructor-arg name="connector" ref="msConnector" />
+    </bean>
+
+    <!--ms integration-->
+    
+    <bean id="msRouter" class="ru.otus.sokolovsky.hw16.integration.client.MessageRouter">
+        <property name="actionHandlers">
+            <map>
+                <entry key="ru.otus.sokolovsky.hw16.web.ms.Actions.NOTIFY_ALL_USERS">
+                    <bean class="ru.otus.sokolovsky.hw16.web.ms.NotifyAllUsersHandler">
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="msConnector" class="ru.otus.sokolovsky.hw16.integration.client.ConnectorImpl">
+        <property name="handlers">
+            <list>
+                <ref bean="msRouter" />
+            </list>
+        </property>
     </bean>
 </beans>

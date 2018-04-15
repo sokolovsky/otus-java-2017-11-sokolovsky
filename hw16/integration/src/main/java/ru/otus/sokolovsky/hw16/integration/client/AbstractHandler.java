@@ -1,17 +1,17 @@
-package ru.otus.sokolovsky.hw16.db.ms;
+package ru.otus.sokolovsky.hw16.integration.client;
 
 import ru.otus.sokolovsky.hw16.integration.message.Message;
 
 import java.util.function.Consumer;
 
 public abstract class AbstractHandler implements Consumer<Message> {
-    private Consumer<Message> sender;
+    private Connector connector;
 
-    public void setSender(Consumer<Message> sender) {
-        this.sender = sender;
+    public void setConnector(Connector connector) {
+        this.connector = connector;
     }
 
     public Consumer<Message> getSender() {
-        return sender;
+        return connector::sendMessage;
     }
 }

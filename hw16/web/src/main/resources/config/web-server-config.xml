@@ -21,6 +21,9 @@
                             <Call name="setRenderer">
                                 <Arg><Ref refid="renderer" /></Arg>
                             </Call>
+                            <Call name="setMessageSystemConnector">
+                                <Arg><Call name="getMSConnector" class="ru.otus.sokolovsky.hw16.web.App"/></Arg>
+                            </Call>
                         </New>
                     </Arg>
                 </New>
@@ -37,6 +40,9 @@
                             </Call>
                             <Call name="setRenderer">
                                 <Arg><Ref refid="renderer" /></Arg>
+                            </Call>
+                            <Call name="setMessageSystemConnector">
+                                <Arg><Call name="getMSConnector" class="ru.otus.sokolovsky.hw16.web.App"/></Arg>
                             </Call>
                         </New>
                     </Arg>

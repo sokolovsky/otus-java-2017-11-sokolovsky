@@ -1,6 +1,7 @@
 package ru.otus.sokolovsky.hw16.db.ms;
 
 import ru.otus.sokolovsky.hw16.db.domain.UserDBRepository;
+import ru.otus.sokolovsky.hw16.integration.client.AbstractHandler;
 import ru.otus.sokolovsky.hw16.integration.message.Message;
 import ru.otus.sokolovsky.hw16.integration.message.MessageFactory;
 import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;

@@ -10,6 +10,7 @@ public class MessageFactory {
         try {
             Constructor<? extends Message> constructor = message.getClass().getDeclaredConstructor(String.class, String.class, MessageType.class);
             Message replyMessage = constructor.newInstance(message.getSource(), message.getName(), message.getType());
+            replyMessage.setSource(message.getDestination());
             message.getHeaders().forEach(replyMessage::setHeader);
             return replyMessage;
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
@@ -19,5 +20,9 @@ public class MessageFactory {
 
     public static ParametrizedMessage createControlMessage(ServiceAction action) {
         return new ParametrizedMessageImpl("service", action.getName(), MessageType.COMMAND_MESSAGE);
+    }
+
+    public static ParametrizedMessage createRequestResponseMessage(String dest, String name) {
+        return new ParametrizedMessageImpl(dest, name, MessageType.REQUEST_REPLY_MESSAGE);
     }
 }
