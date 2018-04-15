@@ -1,8 +1,8 @@
 package ru.otus.sokolovsky.hw16.db.db;
 
-import ru.otus.sokolovsky.hw15.domain.DBRepository;
-import ru.otus.sokolovsky.hw15.domain.DataSet;
-import ru.otus.sokolovsky.hw15.myorm.DataSetDao;
+import ru.otus.sokolovsky.hw16.db.domain.DBRepository;
+import ru.otus.sokolovsky.hw16.db.domain.DataSet;
+import ru.otus.sokolovsky.hw16.db.myorm.DataSetDao;
 
 import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;

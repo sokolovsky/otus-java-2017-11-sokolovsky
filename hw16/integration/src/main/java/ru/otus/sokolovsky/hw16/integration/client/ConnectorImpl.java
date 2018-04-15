@@ -39,6 +39,10 @@ public class ConnectorImpl implements Connector {
         }
     }
 
+    public void setHandlers(List<Consumer<Message>> handlers) {
+        this.handlers = handlers;
+    }
+
     private void arise(Message message) {
         handlers.forEach(c -> c.accept(message));
     }

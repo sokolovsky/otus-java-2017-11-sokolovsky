@@ -1,6 +1,6 @@
 package ru.otus.sokolovsky.hw16.db.db;
 
-import ru.otus.sokolovsky.hw15.domain.DataSet;
+import ru.otus.sokolovsky.hw16.db.domain.DataSet;
 
 import javax.persistence.*;
 

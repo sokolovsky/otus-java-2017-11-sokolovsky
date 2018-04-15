@@ -6,7 +6,7 @@ import java.util.Map;
 public class ParametrizedMessageImpl extends AbstractMessage implements ParametrizedMessage {
     private Map<String, String> parameters = new HashMap<>();
 
-    public ParametrizedMessageImpl(String destination, String name, MessageTypes type) {
+    public ParametrizedMessageImpl(String destination, String name, MessageType type) {
         super(destination, name, type);
     }
 

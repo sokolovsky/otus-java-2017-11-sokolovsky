@@ -17,5 +17,5 @@ public interface Message {
 
     byte[] getBody();
 
-    MessageTypes getType();
+    MessageType getType();
 }

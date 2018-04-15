@@ -1,6 +1,6 @@
 package ru.otus.sokolovsky.hw16.db.db;
 
-import ru.otus.sokolovsky.hw15.domain.ChatDBRepository;
+import ru.otus.sokolovsky.hw16.db.domain.ChatDBRepository;
 
 import java.sql.Connection;
 

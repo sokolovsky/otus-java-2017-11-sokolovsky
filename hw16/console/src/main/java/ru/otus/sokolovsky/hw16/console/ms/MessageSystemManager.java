@@ -21,7 +21,7 @@ public class MessageSystemManager implements Runnable {
     }
 
     public void createChannel(String name) {
-        ParametrizedMessage message = new ParametrizedMessageImpl("service", "create-new-named-channel", MessageTypes.COMMAND_MESSAGE);
+        ParametrizedMessage message = new ParametrizedMessageImpl("service", "create-new-named-channel", MessageType.COMMAND_MESSAGE);
         message.setParameter("channel", name);
         queue.add(message);
     }

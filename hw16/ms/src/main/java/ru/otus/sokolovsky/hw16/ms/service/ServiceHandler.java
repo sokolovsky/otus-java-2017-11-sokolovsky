@@ -1,10 +1,10 @@
 package ru.otus.sokolovsky.hw16.ms.service;
 
-import ru.otus.sokolovsky.hw16.integration.control.ServiceActions;
+import ru.otus.sokolovsky.hw16.integration.control.ServiceAction;
 import ru.otus.sokolovsky.hw16.ms.channel.Channel;
 import ru.otus.sokolovsky.hw16.ms.manage.SystemManager;
 import ru.otus.sokolovsky.hw16.integration.message.Message;
-import ru.otus.sokolovsky.hw16.integration.message.MessageTypes;
+import ru.otus.sokolovsky.hw16.integration.message.MessageType;
 import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
 
 public class ServiceHandler {
@@ -21,12 +21,12 @@ public class ServiceHandler {
     }
 
     private void handleMessage(Message message) {
-        if (message.getType() != MessageTypes.COMMAND_MESSAGE) {
+        if (message.getType() != MessageType.COMMAND_MESSAGE) {
             return;
         }
         ParametrizedMessage pMessage = (ParametrizedMessage) message;
 
-        ServiceActions action = ServiceActions.getByName(message.getName());
+        ServiceAction action = ServiceAction.getByName(message.getName());
         if (action == null) {
             throw new IllegalStateException("Message needs to have right name");
         }

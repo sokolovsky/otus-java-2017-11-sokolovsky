@@ -1,0 +1,74 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations" value="/META-INF/project.properties"/>
+    </bean>
+
+    <bean id="usersProvider" class="ru.otus.sokolovsky.hw16.db.provider.UsersProvider">
+        <constructor-arg name="str" value="${users}"/>
+        <constructor-arg name="executor" ref="sqlExecutor"/>
+    </bean>
+    <bean id="dbConnection" class="ru.otus.sokolovsky.hw16.db.myorm.ConnectionBuilder" factory-method="build">
+        <constructor-arg name="connStr" value="${jdbc.connection}"/>
+        <constructor-arg name="driverDefinition" value="${jdbc.driver}"/>
+        <constructor-arg name="user" value="${jdbc.user}"/>
+        <constructor-arg name="pass" value="${jdbc.pass}"/>
+    </bean>
+    <bean id="sqlExecutor" class="ru.otus.sokolovsky.hw16.db.myorm.SqlExecutor">
+        <constructor-arg name="connection" ref="dbConnection"/>
+    </bean>
+    <bean id="databaseBuilder" class="ru.otus.sokolovsky.hw16.db.provider.DatabaseBuilder">
+        <constructor-arg name="createSqlFiles" value="${createTableFiles}"/>
+        <constructor-arg name="dropSqlFiles" value="${dropTableFiles}"/>
+        <constructor-arg name="executor" ref="sqlExecutor"/>
+    </bean>
+
+    <!--messages dependencies-->
+
+    <bean id="userDbRepository" class="ru.otus.sokolovsky.hw16.db.db.UserDBRepositoryImpl">
+        <constructor-arg name="connection" ref="dbConnection"/>
+    </bean>
+
+    <bean id="chatDbRepository" class="ru.otus.sokolovsky.hw16.db.db.ChatDBRepositoryImpl">
+        <constructor-arg name="connection" ref="dbConnection"/>
+    </bean>
+
+    <bean id="chatMessage" class="ru.otus.sokolovsky.hw16.db.db.ChatMessageDataSet" scope="prototype"
+          lazy-init="true"/>
+
+    <bean id="msRouter" class="ru.otus.sokolovsky.hw16.db.ms.MessageRouter">
+        <property name="actionHandlers">
+            <map>
+                <entry key="ru.otus.sokolovsky.hw16.db.ms.Actions.CHECK_USER">
+                    <bean class="ru.otus.sokolovsky.hw16.db.ms.CheckUserHandler">
+                        <constructor-arg name="userRepo" ref="userDbRepository"/>
+                    </bean>
+                </entry>
+                <entry key="ru.otus.sokolovsky.hw16.db.ms.Actions.REGISTER_NEW_MESSAGE">
+                    <bean class="ru.otus.sokolovsky.hw16.db.ms.RegisterNewMessageHandler">
+                        <constructor-arg name="userRepo" ref="userDbRepository"/>
+                        <constructor-arg name="chatRepo" ref="chatDbRepository"/>
+                    </bean>
+                </entry>
+                <entry key="ru.otus.sokolovsky.hw16.db.ms.Actions.GET_LAST_MESSAGES">
+                    <bean class="ru.otus.sokolovsky.hw16.db.ms.GetLastMessagesHandler">
+                        <constructor-arg name="chatRepo" ref="chatDbRepository"/>
+                        <constructor-arg name="userRepo" ref="userDbRepository"/>
+                        <constructor-arg name="limit" value="10"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="msConnector" class="ru.otus.sokolovsky.hw16.integration.client.ConnectorImpl">
+        <property name="handlers">
+            <list>
+                <ref bean="msRouter" />
+            </list>
+        </property>
+    </bean>
+</beans>

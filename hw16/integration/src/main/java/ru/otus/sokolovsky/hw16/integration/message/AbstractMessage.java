@@ -8,10 +8,10 @@ public abstract class AbstractMessage implements Message {
     private String destination;
     private String source;
     private String name;
-    private MessageTypes type;
+    private MessageType type;
     private Map<String, String> headers = new HashMap<>();
 
-    AbstractMessage(String destination, String name, MessageTypes type) {
+    AbstractMessage(String destination, String name, MessageType type) {
         this.destination = destination;
         this.name = name;
         this.type = type;
@@ -45,7 +45,7 @@ public abstract class AbstractMessage implements Message {
         headers.put(name, value);
     }
 
-    public MessageTypes getType() {
+    public MessageType getType() {
         return type;
     }
 }

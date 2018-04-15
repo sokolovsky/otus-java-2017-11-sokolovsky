@@ -1,6 +1,6 @@
 package ru.otus.sokolovsky.hw16.db.db;
 
-import ru.otus.sokolovsky.hw15.domain.UserDBRepository;
+import ru.otus.sokolovsky.hw16.db.domain.UserDBRepository;
 
 import java.sql.Connection;
 import java.util.HashMap;

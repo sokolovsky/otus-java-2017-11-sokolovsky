@@ -1,6 +1,6 @@
 package ru.otus.sokolovsky.hw16.db.provider;
 
-import ru.otus.sokolovsky.hw15.myorm.SqlExecutor;
+import ru.otus.sokolovsky.hw16.db.myorm.SqlExecutor;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,8 +51,6 @@ public class DatabaseBuilder {
                 String line = scanner.nextLine();
                 result.append(line).append("\n");
             }
-            scanner.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }

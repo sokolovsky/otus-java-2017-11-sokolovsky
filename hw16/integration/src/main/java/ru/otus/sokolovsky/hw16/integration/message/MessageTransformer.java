@@ -15,7 +15,7 @@ public class MessageTransformer {
         ParametrizedMessage message;
         try {
             String type = rootJson.getString("type");
-            MessageTypes messageType = MessageTypes.byCode(type);
+            MessageType messageType = MessageType.byCode(type);
             message = new ParametrizedMessageImpl(destination, name, messageType);
         } catch (IllegalArgumentException e) {
             throw new IllegalFormatException(e);
