@@ -26,12 +26,11 @@ public class ChatServiceImpl implements ChatService {
     private void handleNewConnection(String login) {
         System.out.println("To handle connection with: " + login);
         ParametrizedMessage message = MessageFactory.createRequestResponseMessage("DB", "get-last-messages");
-        try {
-            Message response = msConnector.sendMessageAndWaitResponse(message, 30);
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Message response = msConnector.sendMessageAndWaitResponse(message, 30);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override

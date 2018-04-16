@@ -134,6 +134,7 @@ public class ConnectorImpl implements Connector {
                     }
                     Message message;
                     try {
+                        System.out.println("Got message " + row);
                         message = MessageTransformer.fromJson(row);
                         arise(message);
                     } catch (IllegalFormatException e) {
