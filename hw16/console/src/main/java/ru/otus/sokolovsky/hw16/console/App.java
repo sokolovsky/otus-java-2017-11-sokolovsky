@@ -19,7 +19,7 @@ public class App {
     final String MS_INSTANCE_NAME = "ms";
 
     public static void main(String[] args) throws IllegalFormatException {
-        ParametrizedMessage message = MessageTransformer.fromJson("{\"type\":\"command\",\"destination\":\"service\",\"source\":null,\"name\":\"create-new-named-channel\",\"headers\":{},\"body\":{\"channel\":\"DB\"}}");
+        ParametrizedMessage message = (ParametrizedMessage) MessageTransformer.fromJson("{\"type\":\"command\",\"destination\":\"service\",\"source\":null,\"name\":\"create-new-named-channel\",\"headers\":{},\"body\":{\"channel\":\"DB\"}}");
         ApplicationContext applicationContext = getApplicationContext();
 
         ConsoleContext console = (ConsoleContext) applicationContext.getBean("consoleContext");

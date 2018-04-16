@@ -4,7 +4,7 @@ import org.json.JSONObject;
 import org.json.JSONWriter;
 import ru.otus.sokolovsky.hw16.integration.client.Connector;
 import ru.otus.sokolovsky.hw16.integration.control.ServiceAction;
-import ru.otus.sokolovsky.hw16.integration.message.Message;
+import ru.otus.sokolovsky.hw16.integration.message.ListParametrizedMessage;
 import ru.otus.sokolovsky.hw16.integration.message.MessageFactory;
 import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
 
@@ -26,11 +26,19 @@ public class ChatServiceImpl implements ChatService {
     private void handleNewConnection(String login) {
         System.out.println("To handle connection with: " + login);
         ParametrizedMessage message = MessageFactory.createRequestResponseMessage("DB", "get-last-messages");
-//        try {
-//            Message response = msConnector.sendMessageAndWaitResponse(message, 30);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            ListParametrizedMessage response = (ListParametrizedMessage) msConnector.sendMessageAndWaitResponse(message, 30);
+            response.getList().forEach(obj -> {
+                ChatMessage chatMessage = new ChatMessage(
+                        obj.get("login"),
+                        obj.get("time"),
+                        obj.get("text")
+                );
+                pushMessage(chatMessage);
+            });
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

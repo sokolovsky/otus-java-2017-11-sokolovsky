@@ -1,6 +1,6 @@
 package ru.otus.sokolovsky.hw16.ms.client;
 
-import ru.otus.sokolovsky.hw16.integration.message.IllegalFormatException;
+import ru.otus.sokolovsky.hw16.integration.message.ListParametrizedMessage;
 import ru.otus.sokolovsky.hw16.integration.message.Message;
 import ru.otus.sokolovsky.hw16.integration.message.MessageTransformer;
 import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
@@ -9,7 +9,6 @@ import ru.otus.sokolovsky.hw16.ms.channel.PointToPointChannel;
 import java.io.*;
 import java.net.Socket;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 /**
  * Used in another thread
@@ -27,11 +26,15 @@ public class Connector implements Runnable, AutoCloseable{
     }
 
     private void sendMessage(Message message) {
-        ParametrizedMessage pMessage = (ParametrizedMessage) message;
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
             BufferedWriter writer = new BufferedWriter(outputStreamWriter);
-            writer.write(MessageTransformer.toJson(pMessage));
+            if (message instanceof ParametrizedMessage) {
+                writer.write(MessageTransformer.toJson((ParametrizedMessage) message));
+            }
+            if (message instanceof ListParametrizedMessage) {
+                writer.write(MessageTransformer.toJson((ListParametrizedMessage) message));
+            }
             writer.newLine();
             writer.flush();
         } catch (IOException e) {
@@ -54,18 +57,13 @@ public class Connector implements Runnable, AutoCloseable{
                 if (row.trim().length() == 0) {
                     continue;
                 }
-                ParametrizedMessage message;
-                try {
-                    message = MessageTransformer.fromJson(row);
-                } catch (IllegalFormatException e) {
-                    e.printStackTrace();
-                    continue;
-                }
+                Message message;
+                message = MessageTransformer.fromJson(row);
                 message.setSource(channel.getName());
                 messageReceiver.accept(message);
             }
-        } catch (IOException e) {
-            System.out.println("IO Exception: " + e.getMessage() + ", Channel: " + channel.getName());
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage() + ", Channel: " + channel.getName());
             e.printStackTrace();
         }
     }

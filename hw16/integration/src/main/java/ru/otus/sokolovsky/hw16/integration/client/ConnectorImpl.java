@@ -1,9 +1,7 @@
 package ru.otus.sokolovsky.hw16.integration.client;
 
+import ru.otus.sokolovsky.hw16.integration.message.*;
 import ru.otus.sokolovsky.hw16.integration.message.IllegalFormatException;
-import ru.otus.sokolovsky.hw16.integration.message.Message;
-import ru.otus.sokolovsky.hw16.integration.message.MessageTransformer;
-import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
 
 import java.io.*;
 import java.net.Socket;
@@ -111,16 +109,23 @@ public class ConnectorImpl implements Connector {
                         Message message = dispatchQueue.take(); // Blocks
                         OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream());
                         PrintWriter sender = new PrintWriter(writer);
-                        String json = MessageTransformer.toJson((ParametrizedMessage) message);
+                        String json = "";
+                        if (message instanceof ParametrizedMessage) {
+                            json = MessageTransformer.toJson((ParametrizedMessage) message);
+                        }
+                        if (message instanceof ListParametrizedMessage) {
+                            json = MessageTransformer.toJson((ListParametrizedMessage) message);
+                        }
                         sender.println(json);
                         sender.println();
                         sender.flush();
+                        System.out.println("Sent message " + json);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                         return;
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return;
             }
@@ -144,14 +149,9 @@ public class ConnectorImpl implements Connector {
                         continue;
                     }
                     Message message;
-                    try {
-                        System.out.println("Got message " + row);
-                        message = MessageTransformer.fromJson(row);
-                        arise(message);
-                    } catch (IllegalFormatException e) {
-                        e.printStackTrace();
-                        continue;
-                    }
+                    System.out.println("Got message " + row);
+                    message = MessageTransformer.fromJson(row);
+                    arise(message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
