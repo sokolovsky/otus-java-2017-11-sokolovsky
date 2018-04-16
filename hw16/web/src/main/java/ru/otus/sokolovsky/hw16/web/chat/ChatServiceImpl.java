@@ -76,7 +76,7 @@ public class ChatServiceImpl implements ChatService {
         ParametrizedMessage message = MessageFactory.createControlMessage(ServiceAction.SUBSCRIBE_ON_CHANNEL);
         message.setParameter("channel", "CHAT_BROADCAST");
         msConnector.sendMessage(message);
-        msConnector.addMessageHandler((m) -> {
+        msConnector.addChannelMessageHandler("CHAT_BROADCAST", (m) -> {
             ParametrizedMessage pMessage = (ParametrizedMessage) m;
             Map<String, String> parameters = pMessage.getParameters();
             ChatMessage chatMessage = new ChatMessage(

@@ -15,5 +15,7 @@ public interface Connector extends AutoCloseable {
 
     void addMessageHandler(Consumer<Message> handler);
 
+    void addChannelMessageHandler(String channelName, Consumer<Message> handler);
+
     void close();
 }

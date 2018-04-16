@@ -48,14 +48,14 @@
                         <property name="connector" ref="msConnector"/>
                     </bean>
                 </entry>
-                <entry key="get-last-messages">
+                <entry key="register-new-message">
                     <bean class="ru.otus.sokolovsky.hw16.db.ms.RegisterNewMessageHandler">
                         <constructor-arg name="userRepo" ref="userDbRepository"/>
                         <constructor-arg name="chatRepo" ref="chatDbRepository"/>
                         <property name="connector" ref="msConnector"/>
                     </bean>
                 </entry>
-                <entry key="register-new-message">
+                <entry key="get-last-messages">
                     <bean class="ru.otus.sokolovsky.hw16.db.ms.GetLastMessagesHandler">
                         <constructor-arg name="chatRepo" ref="chatDbRepository"/>
                         <constructor-arg name="userRepo" ref="userDbRepository"/>

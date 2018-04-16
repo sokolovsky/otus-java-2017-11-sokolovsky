@@ -7,15 +7,15 @@ import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 public class ConnectorImpl implements Connector {
     private int port;
     private Socket socket;
-    private List<Consumer<Message>> handlers = new LinkedList<>();
+    private List<Consumer<Message>> globalHandlers = new LinkedList<>();
+    private Map<String, List<Consumer<Message>>> channelHandlers = new HashMap<>();
     private BlockingQueue<Message> dispatchQueue = new ArrayBlockingQueue<>(10);
 
     @Override
@@ -37,11 +37,15 @@ public class ConnectorImpl implements Connector {
     }
 
     public void setHandlers(List<Consumer<Message>> handlers) {
-        this.handlers = handlers;
+        this.globalHandlers = handlers;
     }
 
     private void arise(Message message) {
-        handlers.forEach(c -> c.accept(message));
+        globalHandlers.forEach(c -> c.accept(message));
+        if (message.getDestination() != null && channelHandlers.get(message.getDestination()) != null) {
+            List<Consumer<Message>> channelHandlers = this.channelHandlers.get(message.getDestination());
+            channelHandlers.forEach(c -> c.accept(message));
+        }
     }
 
     @Override
@@ -62,13 +66,20 @@ public class ConnectorImpl implements Connector {
         };
         addMessageHandler(handler);
         Message response = block.poll(waitingInSec, TimeUnit.SECONDS);
-        handlers.remove(handler);
+        globalHandlers.remove(handler);
         return response;
     }
 
     @Override
     public void addMessageHandler(Consumer<Message> handler) {
-        handlers.add(handler);
+        globalHandlers.add(handler);
+    }
+
+    @Override
+    public void addChannelMessageHandler(String channelName, Consumer<Message> handler) {
+        channelHandlers.putIfAbsent(channelName, new ArrayList<>());
+        List<Consumer<Message>> list = channelHandlers.get(channelName);
+        list.add(handler);
     }
 
     public void setDispatchQueue(BlockingQueue<Message> dispatchQueue) {

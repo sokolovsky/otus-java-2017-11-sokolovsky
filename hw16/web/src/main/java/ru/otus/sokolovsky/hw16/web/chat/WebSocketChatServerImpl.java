@@ -13,8 +13,6 @@ import java.util.regex.Pattern;
 
 public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocketServer implements ChatServer {
 
-    Connector msConnector;
-
     private static Pattern channelTestPattern = Pattern.compile("^/chat-");
 
     private List<Consumer<String>> messageHandlers = new ArrayList<>();

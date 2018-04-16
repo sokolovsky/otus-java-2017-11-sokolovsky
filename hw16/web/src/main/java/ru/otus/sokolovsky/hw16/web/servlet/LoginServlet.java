@@ -38,7 +38,7 @@ public class LoginServlet extends RenderedServlet {
             return;
         }
 
-        render(resp.getWriter(), new HashMap<String, Object>() {{
+        render(resp.getWriter(), new HashMap<>() {{
             put("error", "User with sent data doesn't exist");
         }});
         Utils.responseOk(resp);
