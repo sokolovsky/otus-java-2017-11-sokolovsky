@@ -9,11 +9,22 @@ public class Terminal {
 
     private final Writer out;
     private final Reader in;
+    private final String clearLine;
     private String prompt = "";
+    private String lastPrompt;
 
     public Terminal(Writer out, Reader in) {
         this.out = out;
         this.in = in;
+        this.clearLine = generateClearLine();
+    }
+
+    private String generateClearLine() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 100; i++) {
+            builder.append('\b');
+        }
+        return builder.toString();
     }
 
     public String getLine() throws IOException {
@@ -21,7 +32,8 @@ public class Terminal {
     }
 
     public String getLine(String prompt) throws IOException {
-        out.write(prompt + " /> ");
+        lastPrompt = prompt + " /> ";
+        out.write(lastPrompt);
         out.flush();
         return readLine();
     }
@@ -46,6 +58,15 @@ public class Terminal {
     }
 
     public void logLine(String line) {
-        writeln(line);
+        try {
+            out.write(clearLine);
+            out.write(line);
+            out.write("\n");
+            out.write(lastPrompt);
+            out.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
