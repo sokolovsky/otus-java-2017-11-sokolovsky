@@ -2,15 +2,15 @@ package ru.otus.sokolovsky.hw16.console.terminal.actions;
 
 import ru.otus.sokolovsky.hw16.console.terminal.Terminal;
 
-public class IncreaseWebServerAction implements Action {
+public class IncreaseWebServerAction extends EnvironmentControlAction {
     @Override
     public void execute(Terminal terminal) {
-        terminal.writeln("Web instance was increased with port");
+        getEnvironmentDispatcher().increaseWebService();
     }
 
     @Override
     public String help() {
-        return "Increases web servers count with specified port";
+        return "Increases web servers count";
     }
 
     @Override

@@ -17,6 +17,8 @@ public class ProcessRunner {
     private final StreamListener processListener;
     private Process process;
     private Consumer<String> logger = s -> {};
+    private String name;
+
     public ProcessRunner() {
         processListener = new StreamListener();
     }{}
@@ -41,6 +43,15 @@ public class ProcessRunner {
     public void setLogger(Consumer<String> logger) {
         this.logger = logger;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
 
     private class StreamListener extends Thread {
         private InputStream is;

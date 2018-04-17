@@ -2,8 +2,10 @@ package ru.otus.sokolovsky.hw16.console.environment;
 
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher {
 
@@ -54,16 +56,26 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
         }
     }
 
-    @Override
-    public void increaseWebService() {
-        ProcessRunner webProcess = createProcessRunner();
-        webProcesses.add(webProcess);
-        webProcess.setLogger(createLogger("WEB-" + dbProcesses.size()));
+    private ProcessRunner runProcess(String command, String name) {
+        ProcessRunner processRunner = createProcessRunner();
+        processRunner.setName(name);
+        processRunner.setLogger(createLogger(processRunner.getName()));
         try {
-            webProcess.start(webCommand);
+            processRunner.start(command);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return processRunner;
+    }
+
+    private void stopProcess(ProcessRunner processRunner) {
+        processRunner.stop();
+    }
+
+    @Override
+    public void increaseWebService() {
+        ProcessRunner webProcess = runProcess(webCommand, "WEB-" + webProcesses.size());
+        webProcesses.add(webProcess);
     }
 
     private Consumer<String> createLogger(String name) {
@@ -75,20 +87,13 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
         if (webProcesses.size() == 0) {
             return;
         }
-        ProcessRunner processRunner = webProcesses.remove();
-        processRunner.stop();
+        stopProcess(webProcesses.remove());
     }
 
     @Override
     public void increaseDbService() {
-        ProcessRunner dbProcess = createProcessRunner();
+        ProcessRunner dbProcess = runProcess(dbCommand, "DB-" + dbProcesses.size());
         dbProcesses.add(dbProcess);
-        dbProcess.setLogger(createLogger("DB-" + dbProcesses.size()));
-        try {
-            dbProcess.start(dbCommand);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -96,12 +101,26 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
         if (dbProcesses.size() == 0) {
             return;
         }
-        ProcessRunner processRunner = dbProcesses.remove();
-        processRunner.stop();
+        stopProcess(dbProcesses.remove());
     }
 
     @Override
     public void setInfoHandler(Consumer<String> consumer) {
         infoHandler = consumer;
+    }
+
+    @Override
+    public boolean isMessagesSystemRun() {
+        return msProcess != null;
+    }
+
+    @Override
+    public List<String> getRunDbServices() {
+        return dbProcesses.stream().map(ProcessRunner::getName).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getRunWebServices() {
+        return webProcesses.stream().map(ProcessRunner::getName).collect(Collectors.toList());
     }
 }

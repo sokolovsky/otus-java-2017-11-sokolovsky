@@ -2,19 +2,19 @@ package ru.otus.sokolovsky.hw16.console.terminal.actions;
 
 import ru.otus.sokolovsky.hw16.console.terminal.Terminal;
 
-public class IncreaseDbWorkerAction extends EnvironmentControlAction {
+public class DecreaseWebServerAction extends EnvironmentControlAction {
     @Override
     public void execute(Terminal terminal) {
-        getEnvironmentDispatcher().increaseDbService();
+        getEnvironmentDispatcher().decreaseWebService();
     }
 
     @Override
     public String help() {
-        return "Increases db services per one";
+        return "Decreases web servers count";
     }
 
     @Override
     public String formula() {
-        return "increase:db";
+        return "decrease:web";
     }
 }

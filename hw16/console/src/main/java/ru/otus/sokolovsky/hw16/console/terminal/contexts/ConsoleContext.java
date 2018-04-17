@@ -1,10 +1,7 @@
 package ru.otus.sokolovsky.hw16.console.terminal.contexts;
 
 import ru.otus.sokolovsky.hw16.console.terminal.Terminal;
-import ru.otus.sokolovsky.hw16.console.terminal.actions.Action;
-import ru.otus.sokolovsky.hw16.console.terminal.actions.ServiceUpAction;
-import ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseDbWorkerAction;
-import ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseWebServerAction;
+import ru.otus.sokolovsky.hw16.console.terminal.actions.*;
 
 public abstract class ConsoleContext extends Context {
 
@@ -19,9 +16,12 @@ public abstract class ConsoleContext extends Context {
     @Override
     protected Action[] actions() {
         return new Action[] {
+            createStateAction(),
             createServiceUpAction(),
             createIncreaseDbWorkerAction(),
+            createDecreaseDbServerAction(),
             createIncreaseWebServerAction(),
+            createDecreaseWebServerAction()
         };
     }
 
@@ -30,4 +30,10 @@ public abstract class ConsoleContext extends Context {
     protected abstract IncreaseDbWorkerAction createIncreaseDbWorkerAction();
 
     protected abstract IncreaseWebServerAction createIncreaseWebServerAction();
+
+    public abstract EnvironmentStateAction createStateAction();
+
+    public abstract DecreaseDbWorkerAction createDecreaseDbServerAction();
+
+    public abstract EnvironmentControlAction createDecreaseWebServerAction() ;
 }

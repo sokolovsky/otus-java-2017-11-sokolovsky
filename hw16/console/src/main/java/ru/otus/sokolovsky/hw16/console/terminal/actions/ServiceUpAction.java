@@ -1,19 +1,11 @@
 package ru.otus.sokolovsky.hw16.console.terminal.actions;
 
-import ru.otus.sokolovsky.hw16.console.environment.EnvironmentDispatcher;
 import ru.otus.sokolovsky.hw16.console.terminal.Terminal;
 
-public class ServiceUpAction implements Action {
-
-    private EnvironmentDispatcher envDispatcher;
-
-    public ServiceUpAction(EnvironmentDispatcher envDispatcher) {
-        this.envDispatcher = envDispatcher;
-    }
-
+public class ServiceUpAction extends EnvironmentControlAction {
     @Override
     public void execute(Terminal terminal) {
-        envDispatcher.runEnvironment();
+        getEnvironmentDispatcher().runEnvironment();
     }
 
     @Override
