@@ -10,13 +10,8 @@ import ru.otus.sokolovsky.hw16.integration.message.ParametrizedMessage;
 
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.concurrent.Executors;
 
 public class App {
-
-    final String DB_INSTANCE_NAME = "db";
-    final String WEB_INSTANCE_NAME = "web";
-    final String MS_INSTANCE_NAME = "ms";
 
     public static void main(String[] args) throws IllegalFormatException {
         ParametrizedMessage message = (ParametrizedMessage) MessageTransformer.fromJson("{\"type\":\"command\",\"destination\":\"service\",\"source\":null,\"name\":\"create-new-named-channel\",\"headers\":{},\"body\":{\"channel\":\"DB\"}}");

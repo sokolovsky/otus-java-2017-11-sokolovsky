@@ -65,7 +65,6 @@ public class ProcessRunner {
             if (is == null) {
                 throw new IllegalStateException("Need input stream to handle");
             }
-            System.out.println("Start interact with program");
             try (InputStreamReader isr = new InputStreamReader(is)) {
                 BufferedReader br = new BufferedReader(isr);
                 String line;
