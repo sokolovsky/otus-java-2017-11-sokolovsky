@@ -1,13 +1,19 @@
 package ru.otus.sokolovsky.hw16.db.provider;
 
+import org.springframework.core.io.ClassPathResource;
 import ru.otus.sokolovsky.hw16.db.myorm.SqlExecutor;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Objects;
-import java.util.Scanner;
 
 public class DatabaseBuilder {
 
@@ -43,19 +49,23 @@ public class DatabaseBuilder {
     }
 
     private String getFileContent(String fileName) {
-        StringBuilder result = new StringBuilder();
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(Objects.requireNonNull(classLoader.getResource(fileName)).getFile());
-
-        try (Scanner scanner = new Scanner(file)) {
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                result.append(line).append("\n");
+        try {
+            ClassPathResource resource = new ClassPathResource(fileName);
+            InputStream in = resource.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
             }
+            return stringBuilder.toString();
+        } catch (NoSuchFileException e) {
+            System.out.println(e.getReason());
+            throw new RuntimeException(e);
         } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
-        return result.toString();
     }
 }

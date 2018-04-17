@@ -81,6 +81,10 @@
                 <directory>src/main/resources</directory>
                 <targetPath>META-INF</targetPath>
             </resource>
+            <resource>
+                <directory>src/main/resources/tables</directory>
+                <targetPath>tables</targetPath>
+            </resource>
         </resources>
     </build>
 </project>
