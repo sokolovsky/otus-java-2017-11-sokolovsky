@@ -44,4 +44,8 @@ public class Terminal {
             e.printStackTrace();
         }
     }
+
+    public void logLine(String line) {
+        writeln(line);
+    }
 }

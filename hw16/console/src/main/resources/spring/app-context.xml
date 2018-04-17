@@ -8,35 +8,23 @@
         <property name="locations" value="config.properties"/>
     </bean>
 
-    <bean id="msManager" class="ru.otus.sokolovsky.hw16.console.ms.MessageSystemManager">
-        <constructor-arg name="host" value="${ms.connection.host}"/>
-        <constructor-arg name="port" value="${ms.connection.port}"/>
+
+    <bean id="environmentDispatcher" class="ru.otus.sokolovsky.hw16.console.environment.EnvironmentDispatcherImpl">
+        <constructor-arg name="dbCommand" value="${db.run.command}" />
+        <constructor-arg name="msCommand" value="${ms.run.command}" />
+        <constructor-arg name="webCommand" value="${web.run.command}" />
+        <property name="infoHandler" ref="terminalLog" />
+        <lookup-method name="createProcessRunner" bean="processRunner"/>
     </bean>
 
-    <!--The single instance of system-->
-    <bean id="msRunner" class="ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner">
-        <constructor-arg name="command" value="${ms.run.command}" />
-    </bean>
-
-    <!--Could be in many instances-->
-    <bean id="dbRunner" class="ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner" scope="prototype">
-        <constructor-arg name="command" value="${db.run.command}" />
-    </bean>
-
-    <!--Could be in many instances-->
-    <bean id="webRunner" class="ru.otus.sokolovsky.hw16.console.runner.ApplicationRunner" scope="prototype">
-        <constructor-arg name="command" value="${web.run.command}" />
-    </bean>
+    <bean id="processRunner" class="ru.otus.sokolovsky.hw16.console.environment.ProcessRunner" scope="prototype" />
 
     <bean id="increaseDbWorkerAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseDbWorkerAction" scope="prototype" />
 
     <bean id="increaseWebServerAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseWebServerAction" scope="prototype" />
 
     <bean id="serviceUpAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.ServiceUpAction" scope="prototype">
-        <constructor-arg name="msRunner" ref="msRunner" />
-        <constructor-arg name="msManager" ref="msManager" />
-        <property name="dbRunner" ref="dbRunner" />
-        <property name="webRunner" ref="webRunner" />
+        <constructor-arg name="envDispatcher" ref="environmentDispatcher" />
     </bean>
 
     <bean id="consoleContext" class="ru.otus.sokolovsky.hw16.console.terminal.contexts.ConsoleContext">
@@ -47,4 +35,8 @@
     </bean>
 
     <bean id="terminal" class="ru.otus.sokolovsky.hw16.console.App" factory-method="createTerminal" />
+
+    <bean id="terminalLog" class="ru.otus.sokolovsky.hw16.console.terminal.TerminalLogTunnel">
+        <constructor-arg name="terminal" ref="terminal" />
+    </bean>
 </beans>

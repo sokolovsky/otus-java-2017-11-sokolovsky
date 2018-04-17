@@ -1,4 +1,4 @@
-package ru.otus.sokolovsky.hw16.console.runner;
+package ru.otus.sokolovsky.hw16.console.environment;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,21 +8,22 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ApplicationRunner {
+public class ProcessRunner {
 
     private final StreamListener processListener;
     private Process process;
-    private final ProcessBuilder processBuilder;
+    private Consumer<String> logger = s -> {};
+    public ProcessRunner() {
+        processListener = new StreamListener();
+    }{}
 
-    public ApplicationRunner(String command) {
-        processBuilder = new ProcessBuilder(command.split(" "));
-        processListener = new StreamListener(command);
-    }
+    public void start(String command) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
 
-    public void start() throws IOException {
         if (process != null) {
             throw new IllegalStateException("Process has run yet");
         }
@@ -37,34 +38,15 @@ public class ApplicationRunner {
         process.destroy();
     }
 
-    public void afterStart(String event, Runnable f) {
-        processListener.addEventCaller(event, f);
+    public void setLogger(Consumer<String> logger) {
+        this.logger = logger;
     }
 
     private class StreamListener extends Thread {
-        private final Logger logger;
         private InputStream is;
-        private Map<String, List<Runnable>> afterStartCalls = new HashMap<>();
-
-        private StreamListener(String title) {
-            logger = Logger.getLogger(title);
-        }
 
         void setStream(InputStream is) {
             this.is = is;
-        }
-
-        void addEventCaller(String event, Runnable caller) {
-            afterStartCalls.putIfAbsent(event, new LinkedList<>());
-            afterStartCalls.get(event).add(caller);
-        }
-
-        void runCallersIfPresent(String event) {
-            List<Runnable> functions = afterStartCalls.get(event);
-            if (functions == null) {
-                return;
-            }
-            functions.forEach(Runnable::run);
         }
 
         @Override
@@ -77,12 +59,10 @@ public class ApplicationRunner {
                 BufferedReader br = new BufferedReader(isr);
                 String line;
                 while ((line = br.readLine()) != null) {
-                    logger.info(line);
-                    runCallersIfPresent(line);
-//                    out.append(type).append('>').append(line).append('\n');
+                    logger.accept(line);
                 }
             } catch (IOException e) {
-                logger.log(Level.SEVERE, e.getMessage());
+                logger.accept(e.getMessage());
             }
         }
     }
