@@ -25,6 +25,23 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
 
     @Override
     public void runEnvironment() {
+        try {
+            runMessageSystem();
+            // for warming up
+            Thread.sleep(1000);
+
+            increaseDbService();
+            // for warming up
+            Thread.sleep(1000);
+
+            increaseWebService();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void runMessageSystem() {
         if (msProcess != null) {
             throw new IllegalStateException("Environment has been launched yet.");
         }
@@ -35,10 +52,6 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        increaseDbService();
-
-        increaseWebService();
     }
 
     @Override
