@@ -2,7 +2,6 @@ package ru.otus.sokolovsky.hw16.web.chat;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
-import ru.otus.sokolovsky.hw16.integration.client.Connector;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -102,7 +101,7 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
 
     @Override
     public void listen() {
-        System.out.println("Start listening port " + getPort());
+        System.out.println("Web socket server has started listening port: " + getPort());
         this.start();
     }
 
@@ -110,9 +109,7 @@ public class WebSocketChatServerImpl extends org.java_websocket.server.WebSocket
     public void close() {
         try {
             this.stop();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }

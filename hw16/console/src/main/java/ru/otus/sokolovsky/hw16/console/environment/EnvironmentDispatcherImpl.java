@@ -12,6 +12,10 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
     private final String msCommand;
     private final String dbCommand;
     private final String webCommand;
+
+    private int defaultWebPort;
+    private String webPortParamName;
+
     private ProcessRunner msProcess;
     private Queue<ProcessRunner> webProcesses = new LinkedList<>();
     private Queue<ProcessRunner> dbProcesses = new LinkedList<>();
@@ -25,6 +29,14 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
         this.webCommand = webCommand;
     }
 
+    public void setDefultWebPort(int port) {
+        defaultWebPort = port;
+    }
+
+    public void setWebPortParamName(String name) {
+        webPortParamName = name;
+    }
+
     @Override
     public void runEnvironment() {
         try {
@@ -36,7 +48,7 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
             // for warming up
             Thread.sleep(1000);
 
-            increaseWebService();
+            increaseWebService(defaultWebPort);
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -73,8 +85,13 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
     }
 
     @Override
-    public void increaseWebService() {
-        ProcessRunner webProcess = runProcess(webCommand, "WEB-" + webProcesses.size());
+    public void increaseWebService(int port) {
+        if (msProcess == null) {
+            infoHandler.accept("System has not started yet");
+            return;
+        }
+        String command = String.format("%s %s=%d", webCommand, webPortParamName, port);
+        ProcessRunner webProcess = runProcess(command, "WEB-" + webProcesses.size());
         webProcesses.add(webProcess);
     }
 
@@ -92,6 +109,10 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
 
     @Override
     public void increaseDbService() {
+        if (msProcess == null) {
+            infoHandler.accept("System has not started yet");
+            return;
+        }
         ProcessRunner dbProcess = runProcess(dbCommand, "DB-" + dbProcesses.size());
         dbProcesses.add(dbProcess);
     }
@@ -126,12 +147,12 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
 
     public void shutdown() {
         webProcesses.forEach(ProcessRunner::stop);
-        infoHandler.accept("Web processes stoped");
+        infoHandler.accept("Web processes stopped");
         dbProcesses.forEach(ProcessRunner::stop);
-        infoHandler.accept("DB processes stoped");
+        infoHandler.accept("DB processes stopped");
         if (msProcess != null) {
             msProcess.stop();
         }
-        infoHandler.accept("Message System  process stoped");
+        infoHandler.accept("Message System  process stopped");
     }
 }

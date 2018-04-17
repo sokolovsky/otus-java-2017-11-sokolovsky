@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 public interface EnvironmentDispatcher {
     void runEnvironment();
 
-    void increaseWebService();
+    void increaseWebService(int port);
 
     void decreaseWebService();
 

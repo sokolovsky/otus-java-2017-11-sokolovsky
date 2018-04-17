@@ -14,6 +14,8 @@
         <constructor-arg name="dbCommand" value="${db.run.command}" />
         <constructor-arg name="msCommand" value="${ms.run.command}" />
         <constructor-arg name="webCommand" value="${web.run.command}" />
+        <property name="defultWebPort" value="${web.run.port.value}"/>
+        <property name="webPortParamName" value="${web.run.port.key}" />
         <property name="infoHandler" ref="terminalLog" />
         <lookup-method name="createProcessRunner" bean="processRunner"/>
     </bean>

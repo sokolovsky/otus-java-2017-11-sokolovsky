@@ -68,6 +68,7 @@ public class App {
         connector.setPort(webPort);
         server.addConnector(connector);
         server.start();
+        System.out.println("Web server has been started on port: " + webPort);
     }
 
     public static String staticPath() {
