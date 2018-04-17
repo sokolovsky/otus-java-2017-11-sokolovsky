@@ -25,6 +25,7 @@ public class DatabaseBuilder {
         Arrays.stream(createSqlFiles).forEach((file) -> {
             try {
                 executor.execUpdate(getFileContent(file));
+                System.out.println(String.format("File %s loaded", file));
             } catch (SQLException e) {
                 throw new RuntimeException(e.getMessage() + " " + file);
             }
@@ -42,7 +43,7 @@ public class DatabaseBuilder {
     }
 
     private String getFileContent(String fileName) {
-        StringBuilder result = new StringBuilder("");
+        StringBuilder result = new StringBuilder();
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(Objects.requireNonNull(classLoader.getResource(fileName)).getFile());
 

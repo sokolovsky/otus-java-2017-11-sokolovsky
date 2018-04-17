@@ -35,9 +35,9 @@ public class UsersProvider {
             try {
                 ExistExecutorHandler existHandler = new ExistExecutorHandler();
                 executor.execSelect(String.format("SELECT id FROM user WHERE login=\"%s\"", login), existHandler);
-
                 if (!existHandler.has()) {
                     executor.execInsert(String.format("INSERT INTO user SET login=\"%s\", age=20, password=\"%s\"", login, hash));
+                    System.out.println(String.format("User %s registered", login));
                 }
             } catch (SQLException e) {
                 e.printStackTrace();

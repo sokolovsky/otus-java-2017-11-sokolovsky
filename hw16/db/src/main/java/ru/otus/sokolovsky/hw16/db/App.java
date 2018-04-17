@@ -6,6 +6,8 @@ import org.apache.commons.cli.ParseException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.otus.sokolovsky.hw16.db.cli.OptionsBuilder;
+import ru.otus.sokolovsky.hw16.db.provider.DatabaseBuilder;
+import ru.otus.sokolovsky.hw16.db.provider.UsersProvider;
 import ru.otus.sokolovsky.hw16.integration.client.Connector;
 import ru.otus.sokolovsky.hw16.integration.control.ChannelType;
 import ru.otus.sokolovsky.hw16.integration.control.ServiceAction;
@@ -16,20 +18,40 @@ public class App {
 
     public static void main(String[] args) throws ParseException {
         int msPort = getMessageSystemPort(args);
-        System.out.println("MS port - " + msPort);
+        System.out.println("Message System port - " + msPort);
 
         ApplicationContext appContext = getAppContext();
-        Connector connector = (Connector) appContext.getBean("msConnector");
-        connector.setPort(msPort);
 
-        connector.connect();
+        Connector connector = messageSystemConnect(appContext, msPort);
+        createDatabases(appContext);
+        registerUsers(appContext);
+        subscribeOnMessages(connector);
 
+        System.out.println("DB service has being started");
+    }
+
+    private static void subscribeOnMessages(Connector connector) {
         ParametrizedMessage subscribeControlMessage = MessageFactory.createControlMessage(ServiceAction.SUBSCRIBE_ON_CHANNEL);
         subscribeControlMessage.setParameter("channel", "DB");
         subscribeControlMessage.setParameter("channelType", ChannelType.POINT_TO_POINT.name());
         connector.sendMessage(subscribeControlMessage);
+    }
 
-        System.out.println("DB service has being started");
+    private static void registerUsers(ApplicationContext appContext) {
+        UsersProvider usersProvider = (UsersProvider) appContext.getBean("usersProvider");
+        usersProvider.registerIntoDatabase();
+    }
+
+    private static void createDatabases(ApplicationContext appContext) {
+        DatabaseBuilder databaseBuilder = (DatabaseBuilder) appContext.getBean("databaseBuilder");
+        databaseBuilder.createTables();
+    }
+
+    private static Connector messageSystemConnect(ApplicationContext appContext, int port) {
+        Connector connector = (Connector) appContext.getBean("msConnector");
+        connector.setPort(port);
+        connector.connect();
+        return connector;
     }
 
     private static ApplicationContext getAppContext() {

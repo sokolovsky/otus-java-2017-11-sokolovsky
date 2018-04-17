@@ -1,1 +1,0 @@
-SET GLOBAL TIME_ZONE = "+3:00";
