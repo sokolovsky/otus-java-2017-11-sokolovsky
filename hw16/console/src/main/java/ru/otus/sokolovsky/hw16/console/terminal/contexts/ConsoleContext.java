@@ -16,12 +16,14 @@ public abstract class ConsoleContext extends Context {
     @Override
     protected Action[] actions() {
         return new Action[] {
+
             createStateAction(),
             createServiceUpAction(),
             createIncreaseDbWorkerAction(),
             createDecreaseDbServerAction(),
             createIncreaseWebServerAction(),
-            createDecreaseWebServerAction()
+            createDecreaseWebServerAction(),
+            createQuitAction()
         };
     }
 
@@ -36,4 +38,7 @@ public abstract class ConsoleContext extends Context {
     public abstract DecreaseDbWorkerAction createDecreaseDbServerAction();
 
     public abstract EnvironmentControlAction createDecreaseWebServerAction() ;
+
+    protected abstract QuitAction createQuitAction();
+
 }

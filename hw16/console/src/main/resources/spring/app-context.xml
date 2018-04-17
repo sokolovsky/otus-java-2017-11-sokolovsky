@@ -26,6 +26,8 @@
     <bean id="increaseDbWorkerAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseDbWorkerAction" parent="envControlAction" scope="prototype" />
     <bean id="decreaseDbWorkerAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.DecreaseDbWorkerAction" parent="envControlAction" scope="prototype" />
 
+    <bean id="quitAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.EnvironmentQuitAction" parent="envControlAction" scope="prototype" />
+
     <bean id="increaseWebServerAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.IncreaseWebServerAction" parent="envControlAction" scope="prototype" />
     <bean id="decreaseWebServerAction" class="ru.otus.sokolovsky.hw16.console.terminal.actions.DecreaseWebServerAction" parent="envControlAction" scope="prototype" />
 
@@ -40,6 +42,7 @@
         <lookup-method name="createDecreaseDbServerAction" bean="decreaseDbWorkerAction"/>
         <lookup-method name="createIncreaseWebServerAction" bean="increaseWebServerAction"/>
         <lookup-method name="createDecreaseWebServerAction" bean="decreaseWebServerAction"/>
+        <lookup-method name="createQuitAction" bean="quitAction"/>
     </bean>
 
     <bean id="terminal" class="ru.otus.sokolovsky.hw16.console.App" factory-method="createTerminal" />

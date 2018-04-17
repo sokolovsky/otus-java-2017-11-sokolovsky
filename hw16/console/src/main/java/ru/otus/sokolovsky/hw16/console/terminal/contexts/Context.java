@@ -19,7 +19,6 @@ abstract class Context {
 
     private void initActionParsers() {
         LinkedList<Action> actionsList = new LinkedList<>(Arrays.asList(actions()));
-        actionsList.add(new QuitAction());
         actionsList.add(new HelpAction(actionsList));
 
         for (Action action : actionsList) {
@@ -36,7 +35,7 @@ abstract class Context {
         initActionParsers();
 
         Action action = null;
-        while (action == null || action.getClass() != QuitAction.class) {
+        while (!(action instanceof QuitAction)) {
             terminal().setPrompt(prompt());
             String line;
             try {

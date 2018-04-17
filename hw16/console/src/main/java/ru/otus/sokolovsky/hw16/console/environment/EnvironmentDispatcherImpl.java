@@ -123,4 +123,15 @@ public abstract class EnvironmentDispatcherImpl implements EnvironmentDispatcher
     public List<String> getRunWebServices() {
         return webProcesses.stream().map(ProcessRunner::getName).collect(Collectors.toList());
     }
+
+    public void shutdown() {
+        webProcesses.forEach(ProcessRunner::stop);
+        infoHandler.accept("Web processes stoped");
+        dbProcesses.forEach(ProcessRunner::stop);
+        infoHandler.accept("DB processes stoped");
+        if (msProcess != null) {
+            msProcess.stop();
+        }
+        infoHandler.accept("Message System  process stoped");
+    }
 }
