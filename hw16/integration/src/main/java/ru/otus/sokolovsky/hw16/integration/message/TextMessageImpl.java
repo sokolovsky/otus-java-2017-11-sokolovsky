@@ -1,8 +1,5 @@
 package ru.otus.sokolovsky.hw16.integration.message;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class TextMessageImpl extends AbstractMessage implements TextMessage {
     private String body;
 

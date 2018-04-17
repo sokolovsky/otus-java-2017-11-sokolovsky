@@ -11,7 +11,7 @@
         <constructor-arg name="str" value="${users}"/>
         <constructor-arg name="executor" ref="sqlExecutor"/>
     </bean>
-    <bean id="dbConnection" class="ru.otus.sokolovsky.hw16.db.myorm.ConnectionBuilder" factory-method="build">
+    <bean id="dbConnection" class="ru.otus.sokolovsky.hw16.db.myorm.ConnectionBuilder" factory-method="build" destroy-method="close">
         <constructor-arg name="connStr" value="${jdbc.connection}"/>
         <constructor-arg name="driverDefinition" value="${jdbc.driver}"/>
         <constructor-arg name="user" value="${jdbc.user}"/>
@@ -28,11 +28,11 @@
 
     <!--messages dependencies-->
 
-    <bean id="userDbRepository" class="ru.otus.sokolovsky.hw16.db.db.UserDBRepositoryImpl">
+    <bean id="userDbRepository" class="ru.otus.sokolovsky.hw16.db.db.UserDBRepositoryImpl" destroy-method="shutdown">
         <constructor-arg name="connection" ref="dbConnection"/>
     </bean>
 
-    <bean id="chatDbRepository" class="ru.otus.sokolovsky.hw16.db.db.ChatDBRepositoryImpl">
+    <bean id="chatDbRepository" class="ru.otus.sokolovsky.hw16.db.db.ChatDBRepositoryImpl" destroy-method="shutdown">
         <constructor-arg name="connection" ref="dbConnection"/>
     </bean>
 
@@ -67,7 +67,7 @@
         </property>
     </bean>
 
-    <bean name="msConnector" class="ru.otus.sokolovsky.hw16.integration.client.ConnectorImpl">
+    <bean name="msConnector" class="ru.otus.sokolovsky.hw16.integration.client.ConnectorImpl" destroy-method="close">
         <property name="handlers">
             <list>
                 <ref bean="msRouter" />

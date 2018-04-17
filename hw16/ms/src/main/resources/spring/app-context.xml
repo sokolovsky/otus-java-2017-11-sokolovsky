@@ -9,7 +9,7 @@
         <property name="locations" value="META-INF/project.properties"/>
     </bean>
 
-    <bean id="serverListener" class="ru.otus.sokolovsky.hw16.ms.server.ServerListenerImpl">
+    <bean id="serverListener" class="ru.otus.sokolovsky.hw16.ms.server.ServerListenerImpl" destroy-method="dispose">
         <property name="connectionHandlers" ref="connectionHandlers"/>
     </bean>
 
@@ -22,7 +22,7 @@
         <constructor-arg name="channelFactory" ref="channelFactory"/>
     </bean>
 
-    <bean id="connectionPoolHandler" class="ru.otus.sokolovsky.hw16.ms.manage.ConnectionsPoolHandler">
+    <bean id="connectionPoolHandler" class="ru.otus.sokolovsky.hw16.ms.manage.ConnectionsPoolHandler" destroy-method="close">
         <constructor-arg name="systemManager" ref="systemManager" />
     </bean>
 

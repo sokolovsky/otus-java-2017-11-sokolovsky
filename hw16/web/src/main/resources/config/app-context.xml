@@ -13,11 +13,11 @@
         <constructor-arg name="layout" value="templates/layout.ftl"/>
     </bean>
 
-    <bean id="chatServer" class="ru.otus.sokolovsky.hw16.web.chat.WebSocketChatServerImpl">
+    <bean id="chatServer" class="ru.otus.sokolovsky.hw16.web.chat.WebSocketChatServerImpl" destroy-method="close">
         <constructor-arg name="port" value="#{freePortFinder.getPort()}" />
     </bean>
 
-    <bean id="chatService" class="ru.otus.sokolovsky.hw16.web.chat.ChatServiceImpl">
+    <bean id="chatService" class="ru.otus.sokolovsky.hw16.web.chat.ChatServiceImpl" destroy-method="close">
         <constructor-arg name="chatServer" ref="chatServer"/>
         <constructor-arg name="connector" ref="msConnector"/>
     </bean>
@@ -33,19 +33,11 @@
     </bean>
 
     <!--ms integration-->
-    
+
     <bean id="msRouter" class="ru.otus.sokolovsky.hw16.integration.client.MessageRouter">
-        <property name="actionHandlers">
-            <map>
-                <entry key="ru.otus.sokolovsky.hw16.web.ms.Actions.NOTIFY_ALL_USERS">
-                    <bean class="ru.otus.sokolovsky.hw16.web.ms.NotifyAllUsersHandler">
-                    </bean>
-                </entry>
-            </map>
-        </property>
     </bean>
 
-    <bean id="msConnector" class="ru.otus.sokolovsky.hw16.integration.client.ConnectorImpl">
+    <bean id="msConnector" class="ru.otus.sokolovsky.hw16.integration.client.ConnectorImpl" destroy-method="close">
         <property name="handlers">
             <list>
                 <ref bean="msRouter" />

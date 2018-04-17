@@ -1,7 +1,6 @@
 package ru.otus.sokolovsky.hw16.integration.client;
 
 import ru.otus.sokolovsky.hw16.integration.message.*;
-import ru.otus.sokolovsky.hw16.integration.message.IllegalFormatException;
 
 import java.io.*;
 import java.net.Socket;

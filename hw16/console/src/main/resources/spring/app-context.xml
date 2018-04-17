@@ -10,7 +10,7 @@
 
     <bean id="processRunner" class="ru.otus.sokolovsky.hw16.console.environment.ProcessRunner" scope="prototype" />
 
-    <bean id="environmentDispatcher" class="ru.otus.sokolovsky.hw16.console.environment.EnvironmentDispatcherImpl">
+    <bean id="environmentDispatcher" class="ru.otus.sokolovsky.hw16.console.environment.EnvironmentDispatcherImpl" destroy-method="shutdown">
         <constructor-arg name="dbCommand" value="${db.run.command}" />
         <constructor-arg name="msCommand" value="${ms.run.command}" />
         <constructor-arg name="webCommand" value="${web.run.command}" />
