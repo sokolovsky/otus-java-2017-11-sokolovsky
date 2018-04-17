@@ -13,7 +13,7 @@
     <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
     <link rel="stylesheet" href="/assets/css/chat.css">
 
-    <div id="frame" data-login="${login}">
+    <div id="frame" data-login="${login}" data-port="${wsPort}">
         <div class="content">
             <div class="messages">
                 <ul>

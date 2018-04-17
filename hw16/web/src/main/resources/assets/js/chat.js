@@ -3,8 +3,9 @@ $(() => {
     const messageInput = $(container).find('.message-input input')[0];
     const data = $(container).data();
     const login = data.login;
+    const port = data.port;
 
-    const socket = new WebSocket("ws://localhost:10001/chat-" + login);
+    const socket = new WebSocket("ws://localhost:" + port + "/chat-" + login);
     $.extend(socket, {
         onopen: function (event) {
             console.log('Connection is set up');

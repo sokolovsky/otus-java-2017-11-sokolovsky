@@ -3,6 +3,7 @@ package ru.otus.sokolovsky.hw16.web.chat;
 import org.json.JSONObject;
 import org.json.JSONWriter;
 import ru.otus.sokolovsky.hw16.integration.client.Connector;
+import ru.otus.sokolovsky.hw16.integration.control.ChannelType;
 import ru.otus.sokolovsky.hw16.integration.control.ServiceAction;
 import ru.otus.sokolovsky.hw16.integration.message.ListParametrizedMessage;
 import ru.otus.sokolovsky.hw16.integration.message.MessageFactory;
@@ -83,6 +84,7 @@ public class ChatServiceImpl implements ChatService {
     public void start() {
         ParametrizedMessage message = MessageFactory.createControlMessage(ServiceAction.SUBSCRIBE_ON_CHANNEL);
         message.setParameter("channel", "CHAT_BROADCAST");
+        message.setParameter("channelType", ChannelType.PUBLISHER_SUBSCRIBER.name());
         msConnector.sendMessage(message);
         msConnector.addChannelMessageHandler("CHAT_BROADCAST", (m) -> {
             ParametrizedMessage pMessage = (ParametrizedMessage) m;

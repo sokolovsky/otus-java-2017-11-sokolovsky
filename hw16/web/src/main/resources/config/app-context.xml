@@ -14,7 +14,7 @@
     </bean>
 
     <bean id="chatServer" class="ru.otus.sokolovsky.hw16.web.chat.WebSocketChatServerImpl">
-        <constructor-arg name="port" value="${webSocket.port}" />
+        <constructor-arg name="port" value="#{freePortFinder.getPort()}" />
     </bean>
 
     <bean id="chatService" class="ru.otus.sokolovsky.hw16.web.chat.ChatServiceImpl">
@@ -25,6 +25,11 @@
     <bean id="app" class="ru.otus.sokolovsky.hw16.web.App">
         <constructor-arg name="chatService" ref="chatService" />
         <constructor-arg name="connector" ref="msConnector" />
+        <property name="webSocketPort" value="#{freePortFinder.getPort()}" />
+    </bean>
+
+    <bean id="freePortFinder" class="ru.otus.sokolovsky.hw16.web.FreePortFinder">
+        <constructor-arg value="${webSocket.port}"/>
     </bean>
 
     <!--ms integration-->

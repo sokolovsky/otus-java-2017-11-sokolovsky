@@ -12,12 +12,13 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.otus.sokolovsky.hw16.integration.client.Connector;
-import ru.otus.sokolovsky.hw16.web.chat.ChatServer;
 import ru.otus.sokolovsky.hw16.web.chat.ChatService;
 import ru.otus.sokolovsky.hw16.web.cli.OptionsBuilder;
 
 @Configurable
 public class App {
+
+    private int webSocketPort;
 
     private static class Params {
         int webPort;
@@ -29,6 +30,7 @@ public class App {
     static {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/config/app-context.xml");
         instance = (App) context.getBean("app");
+        instance.context = context;
     }
 
     @Autowired
@@ -37,12 +39,14 @@ public class App {
     @Autowired
     private Connector msConnector;
 
+    private ApplicationContext context;
+
     public static void main(String[] args) throws Exception {
         Params cliParams = handleParams(args);
         App app = getInstance();
-        app.launchWebServer(cliParams.webPort);
         app.connectWithMessageSystem(cliParams.msPort);
         app.launchChatServer();
+        app.launchWebServer(cliParams.webPort);
     }
 
     public App(ChatService chatService, Connector connector) {
@@ -60,7 +64,6 @@ public class App {
     }
 
     private void launchWebServer(int webPort) throws Exception {
-
         Resource xml = Resource.newSystemResource("/META-INF/config/web-server-config.xml");
         XmlConfiguration configuration = new XmlConfiguration(xml.getInputStream());
         Server server = (Server)configuration.configure();
@@ -74,10 +77,6 @@ public class App {
     public static String staticPath() {
         ClassLoader classLoader = App.class.getClassLoader();
         return classLoader.getResource("static/assets").toString();
-    }
-
-    private static ApplicationContext getAppContext() {
-        return new ClassPathXmlApplicationContext("/META-INF/config/app-context.xml");
     }
 
     private static Params handleParams(String ...cliArgs) {
@@ -105,5 +104,13 @@ public class App {
 
     public static Connector getMSConnector() {
         return instance.msConnector;
+    }
+
+    public void setWebSocketPort(int port) {
+        webSocketPort = port;
+    }
+
+    public static int getWebSocketPort() {
+        return instance.webSocketPort;
     }
 }

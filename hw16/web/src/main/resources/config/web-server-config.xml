@@ -44,6 +44,9 @@
                             <Call name="setMessageSystemConnector">
                                 <Arg><Call name="getMSConnector" class="ru.otus.sokolovsky.hw16.web.App"/></Arg>
                             </Call>
+                            <Call name="setWebSocketPort">
+                                <Arg><Call name="getWebSocketPort" class="ru.otus.sokolovsky.hw16.web.App" /> </Arg>
+                            </Call>
                         </New>
                     </Arg>
                     <Call name="setInitParameter">
